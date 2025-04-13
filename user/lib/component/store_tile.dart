@@ -43,7 +43,7 @@ class StoreTile extends StatelessWidget {
             child: Container(
               height: 125,
               width: 300,
-              color: Colors.grey.withOpacity(0.2),
+              color: Colors.grey.withOpacity(0.15),
             ),
           ),
           Positioned(

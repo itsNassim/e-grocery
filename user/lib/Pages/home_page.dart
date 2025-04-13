@@ -36,7 +36,7 @@ class _HomePageState extends State<HomePage> {
                 child: Column(
                   children: [
                     SizedBox(
-                      height: 270,
+                      height: 290,
                       child: Stack(
                         children: [
                           Positioned(
@@ -50,7 +50,7 @@ class _HomePageState extends State<HomePage> {
                             left: -80,
                             right: -80,
                             child: SizedBox(
-                              height: height * 0.62,
+                              height: height * 0.55,
                               width: width,
                               child: CircularMotion.builder(
                                 behavior: HitTestBehavior.translucent,

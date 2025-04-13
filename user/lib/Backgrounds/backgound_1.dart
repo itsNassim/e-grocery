@@ -15,7 +15,7 @@ class FirstBackGround extends StatelessWidget {
         clipper: CustomBottomClipper(),
         child: Container(
           color: theme.primaryColor,
-          height: ScreenHeight * 0.35,
+          height: ScreenHeight * 0.3,
         ),
       ),
     );
