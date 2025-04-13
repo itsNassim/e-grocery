@@ -50,7 +50,7 @@ class _HomePageState extends State<HomePage> {
                             left: -80,
                             right: -80,
                             child: SizedBox(
-                              height: height * 0.56,
+                              height: height * 0.62,
                               width: width,
                               child: CircularMotion.builder(
                                 behavior: HitTestBehavior.translucent,
