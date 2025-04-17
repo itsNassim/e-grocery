@@ -36,6 +36,7 @@ dependencies:
   circular_motion: ^0.0.6
   google_nav_bar: ^5.0.7
   standard_searchbar: ^2.0.0
+  dotted_border: ^2.0.0
 
 dev_dependencies:
   flutter_test:

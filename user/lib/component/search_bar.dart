@@ -21,7 +21,7 @@ class CustomSearchBar extends StatelessWidget {
       ),
       suggestions: StandardSuggestions(
         suggestions: [
-          StandardSuggestion(text: 'Suggestion 1'),
+          StandardSuggestion(text: 'Suggestion 1',),
           StandardSuggestion(text: 'Suggestion 2'),
           StandardSuggestion(text: 'Suggestion 3'),
         ],

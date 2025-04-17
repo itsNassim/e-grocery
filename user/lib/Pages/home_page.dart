@@ -1,6 +1,8 @@
 import 'package:circular_motion/circular_motion.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+import 'package:user/Pages/detail-page.dart';
+import 'package:user/Pages/products_page.dart';
+import 'package:user/component/FlyingItemAnimation.dart';
 import 'package:user/component/Item_tile2.dart';
 import 'package:user/component/bootm_nav_bar.dart';
 import 'package:user/component/item_tile1.dart';
@@ -18,6 +20,37 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final GlobalKey _cartKey = GlobalKey();
+
+  Offset _getWidgetPosition(GlobalKey key) {
+    final renderBox = key.currentContext?.findRenderObject() as RenderBox?;
+    if (renderBox != null) {
+      return renderBox.localToGlobal(Offset.zero);
+    } else {
+      return Offset.zero;
+    }
+  }
+
+  void _startAddToCartAnimation(GlobalKey itemKey) {
+    final overlay = Overlay.of(context);
+    final start = _getWidgetPosition(itemKey);
+    final end = _getWidgetPosition(_cartKey);
+
+    late OverlayEntry entry;
+
+    entry = OverlayEntry(
+      builder: (context) {
+        return FlyingItemAnimation(
+          startPosition: start,
+          endPosition: end,
+          onCompleted: () => entry.remove(),
+        );
+      },
+    );
+
+    overlay.insert(entry);
+  }
+
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
@@ -73,11 +106,10 @@ class _HomePageState extends State<HomePage> {
                               child: Row(
                                 children: [
                                   CustomSearchBar(width: width),
-                                  SizedBox(
-                                    width: 12,
-                                  ),
+                                  const SizedBox(width: 12),
                                   GestureDetector(
                                     child: Container(
+                                      key: _cartKey,
                                       height: 50,
                                       width: 50,
                                       decoration: BoxDecoration(
@@ -93,7 +125,7 @@ class _HomePageState extends State<HomePage> {
                                         ),
                                       ),
                                     ),
-                                  )
+                                  ),
                                 ],
                               ),
                             ),
@@ -101,15 +133,13 @@ class _HomePageState extends State<HomePage> {
                         ],
                       ),
                     ),
-                    SizedBox(
-                      height: 20,
-                    ),
+                    const SizedBox(height: 20),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 12.0),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
+                          const Text(
                             "You might need",
                             style: TextStyle(
                               fontSize: 24,
@@ -117,44 +147,67 @@ class _HomePageState extends State<HomePage> {
                             ),
                           ),
                           InkWell(
-                            onTap: () {},
-                            child: Text(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ProductsPage(
+                                    selectedCategoryIndex: 0,
+                                  ),
+                                ),
+                              );
+                            },
+                            child: const Text(
                               "See more",
                               style: TextStyle(
-                                  color: Color(0xffff7006),
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold),
+                                color: Color(0xffff7006),
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
-                          )
+                          ),
                         ],
                       ),
                     ),
-                    SizedBox(
-                      height: 8,
-                    ),
+                    const SizedBox(height: 8),
                     SizedBox(
                       height: 300,
                       child: ListView.builder(
                         scrollDirection: Axis.horizontal,
                         itemCount: 8,
                         itemBuilder: (context, index) {
+                          final itemKey = GlobalKey();
                           return Padding(
                             padding:
                                 const EdgeInsets.symmetric(horizontal: 12.0),
                             child: ItemTile1(
+                              key: itemKey,
                               imageName: "assets/icons/beetroot.png",
                               name: "Beetroot",
                               shopName: "Local shop",
                               weight: "500",
                               price: "17.29",
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => DetailPage(
+                                      title: "Beetroot",
+                                      weight: "500",
+                                      price: "17.29",
+                                    ),
+                                  ),
+                                );
+                              },
+                              onTapCurvedButton: () {
+                                _startAddToCartAnimation(itemKey);
+                              },
                             ),
                           );
                         },
                       ),
                     ),
-                    SizedBox(
-                      height: 20,
-                    ),
+                    const SizedBox(height: 20),
                     SizedBox(
                       height: 150,
                       child: ListView.builder(
@@ -171,22 +224,21 @@ class _HomePageState extends State<HomePage> {
                               name: "Beetroot",
                               time: "12:15",
                               delivery: "free delivery",
-                              fontColor: Color(0xFF6C1144),
-                              timeColor: Color.fromARGB(255, 185, 66, 133),
+                              fontColor: const Color(0xFF6C1144),
+                              timeColor:
+                                  const Color.fromARGB(255, 185, 66, 133),
                             ),
                           );
                         },
                       ),
                     ),
-                    SizedBox(
-                      height: 20,
-                    ),
+                    const SizedBox(height: 20),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 12.0),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
+                          const Text(
                             "Featured store",
                             style: TextStyle(
                               fontSize: 24,
@@ -195,20 +247,19 @@ class _HomePageState extends State<HomePage> {
                           ),
                           InkWell(
                             onTap: () {},
-                            child: Text(
+                            child: const Text(
                               "See all",
                               style: TextStyle(
-                                  color: Color(0xffff7006),
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold),
+                                color: Color(0xffff7006),
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
-                          )
+                          ),
                         ],
                       ),
                     ),
-                    SizedBox(
-                      height: 8,
-                    ),
+                    const SizedBox(height: 8),
                     SizedBox(
                       height: 230,
                       child: ListView.builder(
@@ -227,20 +278,9 @@ class _HomePageState extends State<HomePage> {
                         },
                       ),
                     ),
-                    SizedBox(
-                      height: 100,
-                    ),
+                    const SizedBox(height: 100),
                   ],
                 ),
-              ),
-              Positioned(
-                bottom: 0,
-                left: 0,
-                right: 0,
-                child: MediaQuery.of(context).viewInsets.bottom == 0
-                    ? BootmNavBar()
-                    : SizedBox
-                        .shrink(), // Hides the navbar when keyboard is open
               ),
             ],
           ),
@@ -249,3 +289,4 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
+
