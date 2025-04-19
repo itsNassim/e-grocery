@@ -5,6 +5,7 @@ class CurvedButton extends StatefulWidget {
   final double width;
   final IconData icon;
   final Color color;
+  final bool active;
   final void Function()? onTap;
 
   const CurvedButton({
@@ -13,6 +14,7 @@ class CurvedButton extends StatefulWidget {
     required this.width,
     required this.icon,
     required this.color,
+    required this.active,
     this.onTap,
   });
 
@@ -21,8 +23,19 @@ class CurvedButton extends StatefulWidget {
 }
 
 class _CurvedButtonState extends State<CurvedButton> {
-  bool isQuantitySelector = false;
+  late bool isQuantitySelector;
   int quantity = 1;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    if (widget.active) {
+      isQuantitySelector = false;
+    } else {
+      isQuantitySelector = true;
+    }
+  }
 
   void _toggleToQuantitySelector() {
     if (!isQuantitySelector) {
@@ -46,7 +59,9 @@ class _CurvedButtonState extends State<CurvedButton> {
       });
     } else {
       setState(() {
-        isQuantitySelector = false;
+        if (widget.active) {
+          isQuantitySelector = false;
+        }
         quantity = 1;
       });
     }
@@ -57,7 +72,7 @@ class _CurvedButtonState extends State<CurvedButton> {
     final Color activeColor = const Color(0xFF7D9A4F);
 
     return GestureDetector(
-      onTap: _toggleToQuantitySelector,
+      onTap: widget.active ? _toggleToQuantitySelector : null,
       child: ClipPath(
         clipper: CustomClip(),
         child: Container(

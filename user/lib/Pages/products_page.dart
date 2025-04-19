@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:user/Backgrounds/backgound_1.dart';
 import 'package:user/Pages/detail-page.dart';
+import 'package:user/classes/category_class.dart';
+import 'package:user/classes/products_class.dart';
 import 'package:user/component/FlyingItemAnimation.dart';
 import 'package:user/component/Item_tile1.dart';
 import 'package:user/component/search_bar.dart';
@@ -18,16 +20,7 @@ class ProductsPage extends StatefulWidget {
 }
 
 class _ProductsPageState extends State<ProductsPage> {
-  final List<String> categories = [
-    "Fruits",
-    "Vegetables",
-    "Bakery",
-    "Meat",
-    "Dairy",
-    "Snacks",
-    "Drinks",
-    "Frozen",
-  ];
+  List<String> categories = ["All"];
 
   late ScrollController _categoryScrollController;
   final GlobalKey _cartKey = GlobalKey();
@@ -36,6 +29,25 @@ class _ProductsPageState extends State<ProductsPage> {
   void initState() {
     super.initState();
     _categoryScrollController = ScrollController();
+    categories.addAll(GolbelCategoryList.map((e) => e.name).toList());
+
+    // Wait until the first frame is rendered
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final itemWidth = 90.0;
+      final screenWidth = MediaQuery.of(context).size.width;
+      final offset = (itemWidth * widget.selectedCategoryIndex) -
+          (screenWidth / 2) +
+          (itemWidth / 2);
+
+      _categoryScrollController.animateTo(
+        offset.clamp(
+          _categoryScrollController.position.minScrollExtent,
+          _categoryScrollController.position.maxScrollExtent,
+        ),
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+    });
   }
 
   @override
@@ -253,7 +265,7 @@ class _ProductsPageState extends State<ProductsPage> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
                 child: GridView.builder(
-                  itemCount: 8,
+                  itemCount: globalProductsList.length,
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -271,19 +283,18 @@ class _ProductsPageState extends State<ProductsPage> {
                           padding: const EdgeInsets.symmetric(horizontal: 8.0),
                           child: ItemTile1(
                             key: itemKey,
-                            imageName: "assets/icons/beetroot.png",
-                            name: "Beetroot",
-                            shopName: "Local shop",
-                            weight: "500",
-                            price: "17.29",
+                            imageName: globalProductsList[index].imageName,
+                            name: globalProductsList[index].name,
+                            shopName: globalProductsList[index].shop,
+                            weight: globalProductsList[index].weight,
+                            price: globalProductsList[index].price,
+                            active: true,
                             onTap: () {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => DetailPage(
-                                    title: "Beetroot",
-                                    weight: "500",
-                                    price: "17.29",
+                                    product: globalProductsList[index],
                                   ),
                                 ),
                               );

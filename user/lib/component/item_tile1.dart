@@ -8,6 +8,7 @@ class ItemTile1 extends StatelessWidget {
   final String shopName;
   final String weight;
   final String price;
+  final bool active;
   void Function()? onTap;
   void Function()? onTapCurvedButton;
 
@@ -18,6 +19,7 @@ class ItemTile1 extends StatelessWidget {
     required this.shopName,
     required this.weight,
     required this.price,
+    required this.active,
     required this.onTap,
     required this.onTapCurvedButton,
   });
@@ -63,7 +65,7 @@ class ItemTile1 extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      shopName,
+                      "(${shopName})",
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -119,6 +121,7 @@ class ItemTile1 extends StatelessWidget {
                         width: 150,
                         icon: Icons.add,
                         color: const Color.fromARGB(255, 226, 239, 218),
+                        active: active,
                         onTap: onTapCurvedButton,
                       ),
                     ),

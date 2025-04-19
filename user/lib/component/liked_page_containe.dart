@@ -88,8 +88,7 @@ class _LikedPageContaineState extends State<LikedPageContaine> {
                           onPressed: () {
                             _controller.clear();
                             setState(() {
-                              _selectedIndex =
-                                  null; // Reset selection when text is cleared
+                              _selectedIndex = null;
                             });
                           },
                         )
@@ -117,13 +116,13 @@ class _LikedPageContaineState extends State<LikedPageContaine> {
                         onTap: () {
                           setState(() {
                             _controller.text = widget.suggestion[index];
-                            _selectedIndex = index; // Update selected index
+                            _selectedIndex = index;
                           });
                         },
                         child: DottedBorder(
                           color: _selectedIndex == index
-                              ? const Color(0xff51746C) // Selected color
-                              : Colors.black45, // Default color
+                              ? const Color(0xff51746C)
+                              : Colors.black45,
                           strokeWidth: 1,
                           dashPattern: [10, 3],
                           borderType: BorderType.RRect,
@@ -153,7 +152,8 @@ class _LikedPageContaineState extends State<LikedPageContaine> {
                 onTap: () {
                   if (_controller.text.isNotEmpty) {
                     widget.onCreate?.call(_controller.text);
-                    Navigator.of(context).pop();
+                    Navigator.pop(context);
+                    Navigator.pop(context, true);
                   }
                 },
                 child: Container(

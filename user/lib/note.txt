@@ -1,4 +1,4 @@
-liked page - list logic
+liked page - list logic 99%
 cart page - cart logic - payment
-store page 
+store page - reviews
 profile page  - settings - orders status

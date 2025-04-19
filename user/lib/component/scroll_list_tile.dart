@@ -12,8 +12,8 @@ class ScrollListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 70,
-      height: 100, // increased from 70
+      width: 75,
+      height: 100,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [

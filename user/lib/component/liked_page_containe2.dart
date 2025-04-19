@@ -1,0 +1,174 @@
+import 'package:dotted_border/dotted_border.dart';
+import 'package:flutter/material.dart';
+import 'package:user/classes/likesList_class.dart';
+import 'package:user/component/liked_page_containe.dart';
+import 'package:user/component/likes_page_products_tile.dart';
+import 'package:user/component/likes_page_products_tile2.dart';
+
+class LikedPageContaine2 extends StatefulWidget {
+  final double height;
+  final double width;
+  final void Function(String name)? onCreate;
+  final void Function(int index)? onAdd;
+
+  const LikedPageContaine2({
+    super.key,
+    required this.height,
+    required this.width,
+    this.onCreate,
+    this.onAdd,
+  });
+
+  @override
+  State<LikedPageContaine2> createState() => _LikedPageContaineState();
+}
+
+class _LikedPageContaineState extends State<LikedPageContaine2> {
+  void _showFullScreenBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (context) {
+        return LikedPageContaine(
+          height: MediaQuery.of(context).size.height,
+          width: MediaQuery.of(context).size.width,
+          suggestion: ["Meat", "Mouth watering", "Dinner"],
+          onCreate: widget.onCreate,
+        );
+      },
+    );
+  }
+
+  List<ProductsTile> get productTiles {
+    final width = MediaQuery.of(context).size.width;
+    return golobalLikesList.map((list) {
+      return ProductsTile(
+        width: width,
+        Name: list.title,
+        counter: list.productsList.length,
+        productsList: list.productsList,
+      );
+    }).toList();
+  }
+
+  @override
+  void dispose() {
+    print("Widget is being popped (disposed)");
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    double keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
+
+    return ClipPath(
+      clipper: CustomTopClipper(),
+      child: Container(
+        height: widget.height * 0.5 + (keyboardHeight > 0 ? keyboardHeight : 0),
+        color: Colors.white,
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              const SizedBox(height: 20),
+              Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.grey[400],
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              const SizedBox(height: 20),
+              GestureDetector(
+                onTap: () {
+                  _showFullScreenBottomSheet(context);
+                },
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Container(
+                      height: 30,
+                      width: 30,
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Color(0xffFF6E57),
+                      ),
+                      child: const Icon(
+                        Icons.add,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    const Text(
+                      "Create new list",
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xff0D2826),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(
+                height: 15,
+              ),
+              SizedBox(
+                height: widget.height * 0.35 +
+                    (keyboardHeight > 0 ? keyboardHeight : 0),
+                child: ListView.builder(
+                  itemCount: productTiles.length,
+                  itemBuilder: (context, index) {
+                    return GestureDetector(
+                      onTap: () {
+                        widget.onAdd?.call(index);
+                        Navigator.pop(context, true);
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        child: ProductsTile2(
+                          Name: productTiles[index].Name,
+                          counter: productTiles[index].counter,
+                          productsList: productTiles[index].productsList,
+                          width: widget.width,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class CustomTopClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    Path path = Path();
+    path.moveTo(0, 40);
+    path.quadraticBezierTo(
+      size.width / 2,
+      0,
+      size.width,
+      40,
+    );
+    path.lineTo(size.width, size.height);
+    path.lineTo(0, size.height);
+    path.close();
+    return path;
+  }
+
+  @override
+  bool shouldReclip(covariant CustomClipper oldClipper) {
+    return false;
+  }
+}

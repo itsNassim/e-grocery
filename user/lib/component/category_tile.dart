@@ -31,7 +31,7 @@ class CategoryTile extends StatelessWidget {
             Align(
               alignment: Alignment.topLeft,
               child: Padding(
-                padding: const EdgeInsets.all(12.0),
+                padding: const EdgeInsets.all(11.0),
                 child: Text(
                   category,
                   style: TextStyle(

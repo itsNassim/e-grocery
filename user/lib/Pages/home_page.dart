@@ -2,6 +2,8 @@ import 'package:circular_motion/circular_motion.dart';
 import 'package:flutter/material.dart';
 import 'package:user/Pages/detail-page.dart';
 import 'package:user/Pages/products_page.dart';
+import 'package:user/classes/category_class.dart';
+import 'package:user/classes/products_class.dart';
 import 'package:user/component/FlyingItemAnimation.dart';
 import 'package:user/component/Item_tile2.dart';
 import 'package:user/component/bootm_nav_bar.dart';
@@ -87,11 +89,23 @@ class _HomePageState extends State<HomePage> {
                               width: width,
                               child: CircularMotion.builder(
                                 behavior: HitTestBehavior.translucent,
-                                itemCount: 10,
+                                itemCount: GolbelCategoryList.length,
                                 builder: (context, index) {
-                                  return ScrollListTile(
-                                    title: "cart",
-                                    imageName: "assets/icons/shopping-cart.png",
+                                  return GestureDetector(
+                                    onTap: () {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => ProductsPage(
+                                              selectedCategoryIndex: index + 1,
+                                            ),
+                                          ));
+                                    },
+                                    child: ScrollListTile(
+                                      title: GolbelCategoryList[index].name,
+                                      imageName:
+                                          GolbelCategoryList[index].imageName,
+                                    ),
                                   );
                                 },
                               ),
@@ -174,7 +188,7 @@ class _HomePageState extends State<HomePage> {
                       height: 300,
                       child: ListView.builder(
                         scrollDirection: Axis.horizontal,
-                        itemCount: 8,
+                        itemCount: globalProductsList.length,
                         itemBuilder: (context, index) {
                           final itemKey = GlobalKey();
                           return Padding(
@@ -182,19 +196,18 @@ class _HomePageState extends State<HomePage> {
                                 const EdgeInsets.symmetric(horizontal: 12.0),
                             child: ItemTile1(
                               key: itemKey,
-                              imageName: "assets/icons/beetroot.png",
-                              name: "Beetroot",
-                              shopName: "Local shop",
-                              weight: "500",
-                              price: "17.29",
+                              imageName: globalProductsList[index].imageName,
+                              name: globalProductsList[index].name,
+                              shopName: globalProductsList[index].shop,
+                              weight: globalProductsList[index].weight,
+                              price: globalProductsList[index].price,
+                              active: true,
                               onTap: () {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) => DetailPage(
-                                      title: "Beetroot",
-                                      weight: "500",
-                                      price: "17.29",
+                                      product: globalProductsList[index],
                                     ),
                                   ),
                                 );
@@ -289,4 +302,3 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
-

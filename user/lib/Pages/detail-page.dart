@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:user/Backgrounds/background_2.dart';
+import 'package:user/classes/likesList_class.dart';
+import 'package:user/classes/products_class.dart';
+import 'package:user/component/liked_page_containe2.dart';
 import 'package:user/component/read_more_text.dart';
 import 'package:user/component/stote_tile2.dart';
 
 class DetailPage extends StatefulWidget {
-  final String title;
-  final String weight;
-  final String price;
+  final Product product;
 
   DetailPage({
     super.key,
-    required this.title,
-    required this.weight,
-    required this.price,
+    required this.product,
   });
 
   @override
@@ -23,6 +22,8 @@ class _DetailPageState extends State<DetailPage> {
   late ScrollController _scrollController;
   int? selectedIndex;
   int quantity = 1;
+  bool _hasPopped = false;
+  bool isFavorite = false;
 
   void _increase() {
     setState(() {
@@ -38,13 +39,49 @@ class _DetailPageState extends State<DetailPage> {
     }
   }
 
+  void _showFullScreenBottomSheet(BuildContext context) async {
+    bool wasAdded = await showModalBottomSheet<bool>(
+          context: context,
+          backgroundColor: Colors.transparent,
+          isScrollControlled: true,
+          builder: (context) {
+            return LikedPageContaine2(
+              height: MediaQuery.of(context).size.height,
+              width: MediaQuery.of(context).size.width,
+              onCreate: (name) {
+                setState(() {
+                  final newList =
+                      Likeslist(title: name, productsList: [widget.product]);
+                  golobalLikesList.add(newList);
+                });
+              },
+              onAdd: (index) {
+                setState(() {
+                  golobalLikesList[index].productsList.add(widget.product);
+                });
+              },
+            );
+          },
+        ) ??
+        false;
+    setState(() {
+      isFavorite = wasAdded;
+    });
+  }
+
   @override
   void initState() {
     super.initState();
+    for (var list in golobalLikesList) {
+      if (list.productsList.contains(widget.product)) {
+        isFavorite = true;
+        break;
+      }
+    }
     _scrollController = ScrollController();
-
     _scrollController.addListener(() {
-      if (_scrollController.offset < -100) {
+      if (_scrollController.offset < -100 && !_hasPopped) {
+        _hasPopped = true;
         Future.microtask(() {
           if (Navigator.of(context).canPop()) {
             Navigator.pop(context);
@@ -62,7 +99,7 @@ class _DetailPageState extends State<DetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    List<String> parts = widget.price.split(".");
+    List<String> parts = widget.product.price.split(".");
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
     final toppadding = MediaQuery.of(context).padding.top;
@@ -80,13 +117,19 @@ class _DetailPageState extends State<DetailPage> {
                 controller: _scrollController,
                 child: Column(
                   children: [
-                    SizedBox(height: height * 0.15),
+                    SizedBox(height: height * 0.095),
+                    Icon(
+                      Icons.expand_more,
+                      size: 50,
+                      color: Colors.black45,
+                    ),
+                    SizedBox(height: height * 0.001),
                     Center(
                       child: Stack(
                         children: [
                           ClipRect(
                             child: Image.asset(
-                              "assets/icons/beetroot.png",
+                              widget.product.imageName,
                               height: width,
                               width: width,
                               fit: BoxFit.cover,
@@ -116,7 +159,7 @@ class _DetailPageState extends State<DetailPage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                widget.title,
+                                widget.product.name,
                                 style: const TextStyle(
                                   fontSize: 28,
                                   fontWeight: FontWeight.bold,
@@ -124,7 +167,7 @@ class _DetailPageState extends State<DetailPage> {
                               ),
                               const SizedBox(height: 3),
                               Text(
-                                '${widget.weight}g',
+                                '${widget.product.weight}g',
                                 style: const TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.w700,
@@ -157,18 +200,38 @@ class _DetailPageState extends State<DetailPage> {
                               ),
                             ],
                           ),
-                          Container(
-                            height: 50,
-                            width: 50,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(25),
-                              border: Border.all(
-                                width: 1,
-                                color: Colors.black,
+                          GestureDetector(
+                            onTap: () {
+                              if (!isFavorite) {
+                                _showFullScreenBottomSheet(context);
+                              } else {
+                                // Optional: Remove product from all lists and unfavorite
+                                setState(() {
+                                  for (var list in golobalLikesList) {
+                                    list.productsList.remove(widget.product);
+                                  }
+                                  isFavorite = false;
+                                });
+                              }
+                            },
+                            child: Container(
+                              height: 50,
+                              width: 50,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(25),
+                                border: Border.all(
+                                  width: 1,
+                                  color: Colors.black,
+                                ),
+                                color: Colors.white,
                               ),
-                              color: Colors.white,
+                              child: isFavorite
+                                  ? Icon(
+                                      Icons.favorite,
+                                      color: Colors.red,
+                                    )
+                                  : Icon(Icons.favorite_border_outlined),
                             ),
-                            child: const Icon(Icons.favorite_border_outlined),
                           ),
                         ],
                       ),
@@ -177,11 +240,7 @@ class _DetailPageState extends State<DetailPage> {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8.0),
                       child: ReadMoreText(
-                        text:
-                            'This is a long description that needs to be collapsed initially. Tap Read more to show the full content. '
-                            'This is a long description that needs to be collapsed initially. Tap Read more to show the full content. '
-                            'This is a long description that needs to be collapsed initially. Tap Read more to show the full content. '
-                            'This is a long description that needs to be collapsed initially. Tap Read more to show the full content.',
+                        text: widget.product.description,
                         maxLines: 3,
                         style: const TextStyle(
                           fontSize: 16,
@@ -314,15 +373,6 @@ class _DetailPageState extends State<DetailPage> {
               ),
             ),
 
-            Positioned(
-              top: height * 0.095,
-              left: width * 0.5 - 25,
-              child: Icon(
-                Icons.expand_more,
-                size: 50,
-                color: Colors.black45,
-              ),
-            ),
             //footer
             Positioned(
               bottom: 0,

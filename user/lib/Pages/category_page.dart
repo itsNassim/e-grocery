@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:user/Backgrounds/backgound_1.dart';
 import 'package:user/Pages/products_page.dart';
+import 'package:user/classes/category_class.dart';
 import 'package:user/component/Item_tile2.dart' show ItemTile2;
 import 'package:user/component/bootm_nav_bar.dart';
 import 'package:user/component/category_tile.dart';
@@ -94,7 +95,7 @@ class _CategoryPageState extends State<CategoryPage> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8.0),
                   child: GridView.builder(
-                    itemCount: 8,
+                    itemCount: GolbelCategoryList.length,
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     gridDelegate:
@@ -107,20 +108,23 @@ class _CategoryPageState extends State<CategoryPage> {
                     itemBuilder: (context, index) {
                       return CategoryTile(
                         width: width,
-                        category: "vegetable",
-                        imageUrl: "assets/icons/beetroot.png",
+                        category: GolbelCategoryList[index].name,
+                        imageUrl: GolbelCategoryList[index].imageName,
                         onTap: () {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) =>
-                                    ProductsPage(selectedCategoryIndex: index),
+                                builder: (context) => ProductsPage(
+                                    selectedCategoryIndex: index + 1),
                               ));
                         },
                       );
                     },
                   ),
                 ),
+                SizedBox(
+                  height: 100,
+                )
               ],
             ),
           ),

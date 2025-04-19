@@ -1,22 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:user/classes/products_class.dart';
 
 class ProductsTile extends StatefulWidget {
   double width;
   String Name;
   int counter;
-  String? imageName1;
-  String? imageName2;
-  String? imageName3;
-  String? imageName4;
+  List<Product> productsList;
+
   ProductsTile({
     super.key,
     required this.width,
     required this.Name,
     required this.counter,
-    this.imageName1,
-    this.imageName2,
-    this.imageName3,
-    this.imageName4,
+    required this.productsList,
   });
 
   @override
@@ -74,9 +70,9 @@ class eProductsTileState extends State<ProductsTile> {
                       color: Colors.grey[200],
                     ),
                     child: Center(
-                      child: widget.imageName1 != null
+                      child: widget.productsList.length > 0
                           ? Image.asset(
-                              widget.imageName1!,
+                              widget.productsList[0].imageName,
                               height: 200,
                               width: widget.width * 0.28,
                               fit: BoxFit.cover,
@@ -95,9 +91,9 @@ class eProductsTileState extends State<ProductsTile> {
                       color: Colors.grey[200],
                     ),
                     child: Center(
-                      child: widget.imageName2 != null
+                      child: widget.productsList.length > 1
                           ? Image.asset(
-                              widget.imageName2!,
+                              widget.productsList[1].imageName,
                               height: 200,
                               width: widget.width * 0.28,
                               fit: BoxFit.cover,
@@ -118,9 +114,9 @@ class eProductsTileState extends State<ProductsTile> {
                           color: Colors.grey[200],
                         ),
                         child: Center(
-                          child: widget.imageName3 != null
+                          child: widget.productsList.length > 2
                               ? Image.asset(
-                                  widget.imageName3!,
+                                  widget.productsList[2].imageName,
                                   height: 200,
                                   width: widget.width * 0.28,
                                   fit: BoxFit.cover,
@@ -139,9 +135,9 @@ class eProductsTileState extends State<ProductsTile> {
                           color: Colors.grey[200],
                         ),
                         child: Center(
-                          child: widget.imageName4 != null
+                          child: widget.productsList.length > 3
                               ? Image.asset(
-                                  widget.imageName4!,
+                                  widget.productsList[3].imageName,
                                   height: 200,
                                   width: widget.width * 0.28,
                                   fit: BoxFit.cover,

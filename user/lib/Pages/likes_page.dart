@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:user/Backgrounds/backgound_1.dart';
+import 'package:user/Pages/likes_page_products.dart';
+import 'package:user/classes/likesList_class.dart';
 import 'package:user/component/liked_page_containe.dart';
 import 'package:user/component/likes_page_products_tile.dart';
 import 'package:user/component/search_bar.dart';
@@ -14,13 +16,11 @@ class LikesPage extends StatefulWidget {
 class _LikesPageState extends State<LikesPage> {
   final List<String> items = [
     "All items",
+    "Lists",
     "Stores",
-    "Search",
   ];
 
   int? selectedItemIndex = 0;
-  final List<ProductsTile> productTiles = [];
-
   void _showFullScreenBottomSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
@@ -33,22 +33,25 @@ class _LikesPageState extends State<LikesPage> {
           suggestion: ["Meat", "Mouth watering", "Dinner"],
           onCreate: (name) {
             setState(() {
-              productTiles.add(
-                ProductsTile(
-                  width: MediaQuery.of(context).size.width,
-                  Name: name,
-                  counter: 0,
-                  imageName1: null,
-                  imageName2: null,
-                  imageName3: null,
-                  imageName4: null,
-                ),
-              );
+              final newList = Likeslist(title: name, productsList: []);
+              golobalLikesList.add(newList);
             });
           },
         );
       },
     );
+  }
+
+  List<ProductsTile> get productTiles {
+    final width = MediaQuery.of(context).size.width;
+    return golobalLikesList.map((list) {
+      return ProductsTile(
+        width: width,
+        Name: list.title,
+        counter: list.productsList.length,
+        productsList: list.productsList,
+      );
+    }).toList();
   }
 
   @override
@@ -154,6 +157,7 @@ class _LikesPageState extends State<LikesPage> {
                   onTap: () => _showFullScreenBottomSheet(context),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Container(
                         height: 30,
@@ -187,11 +191,24 @@ class _LikesPageState extends State<LikesPage> {
                 ListView.builder(
                   physics: const NeverScrollableScrollPhysics(),
                   shrinkWrap: true,
-                  itemCount: productTiles.length,
+                  itemCount: golobalLikesList.length,
                   itemBuilder: (context, index) {
                     return Padding(
                       padding: const EdgeInsets.symmetric(vertical: 8.0),
-                      child: productTiles[index],
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => LikesPageProducts(
+                                  title: golobalLikesList[index].title,
+                                  productList:
+                                      golobalLikesList[index].productsList,
+                                ),
+                              ));
+                        },
+                        child: productTiles[index],
+                      ),
                     );
                   },
                 ),
