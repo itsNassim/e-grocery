@@ -2,19 +2,20 @@ import 'package:flutter/material.dart';
 
 class FirstBackGround extends StatelessWidget {
   final ScreenHeight;
+  final Color color;
   FirstBackGround({
     super.key,
     required this.ScreenHeight,
+    required this.color,
   });
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return Container(
       child: ClipPath(
         clipper: CustomBottomClipper(),
         child: Container(
-          color: theme.primaryColor,
+          color: color,
           height: ScreenHeight * 0.3,
         ),
       ),

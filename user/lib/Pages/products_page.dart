@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:user/Backgrounds/backgound_1.dart';
 import 'package:user/Pages/detail-page.dart';
+import 'package:user/blocs/shopping_cart_bloc.dart';
 import 'package:user/classes/category_class.dart';
 import 'package:user/classes/products_class.dart';
 import 'package:user/component/FlyingItemAnimation.dart';
 import 'package:user/component/Item_tile1.dart';
 import 'package:user/component/search_bar.dart';
+import 'package:user/component/shopping_cart_icon.dart';
 
 // ignore: must_be_immutable
 class ProductsPage extends StatefulWidget {
@@ -105,7 +108,10 @@ class _ProductsPageState extends State<ProductsPage> {
                       top: 0,
                       left: 0,
                       right: 0,
-                      child: FirstBackGround(ScreenHeight: height),
+                      child: FirstBackGround(
+                        ScreenHeight: height,
+                        color: Color(0xFF013033),
+                      ),
                     ),
                     // Top Controls
                     Positioned(
@@ -149,22 +155,14 @@ class _ProductsPageState extends State<ProductsPage> {
                             ),
                             // Cart Icon
                             GestureDetector(
-                              child: Container(
-                                key: _cartKey,
-                                height: 50,
-                                width: 50,
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(35),
-                                ),
-                                child: Center(
-                                  child: Image.asset(
-                                    "assets/icons/shopping-cart.png",
-                                    height: 30,
-                                    width: 30,
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
+                              child: BlocBuilder<ShoppingCartBloc,
+                                  ShoppingCartState>(
+                                builder: (context, state) {
+                                  return ShoppingCartIcon(
+                                    cartKey: _cartKey,
+                                    itemCount: state.cartItems.length,
+                                  );
+                                },
                               ),
                             ),
                           ],
@@ -285,7 +283,7 @@ class _ProductsPageState extends State<ProductsPage> {
                             key: itemKey,
                             imageName: globalProductsList[index].imageName,
                             name: globalProductsList[index].name,
-                            shopName: globalProductsList[index].shop,
+                            shopName: globalProductsList[index].shop.name,
                             weight: globalProductsList[index].weight,
                             price: globalProductsList[index].price,
                             active: true,

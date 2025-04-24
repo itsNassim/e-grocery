@@ -1,16 +1,23 @@
 import 'package:circular_motion/circular_motion.dart';
 import 'package:flutter/material.dart';
+import 'package:user/Pages/cart_page.dart';
 import 'package:user/Pages/detail-page.dart';
 import 'package:user/Pages/products_page.dart';
+import 'package:user/Pages/store_page.dart';
 import 'package:user/classes/category_class.dart';
 import 'package:user/classes/products_class.dart';
+import 'package:user/classes/shop_class.dart';
+import 'package:user/classes/shopping_cart_class.dart';
 import 'package:user/component/FlyingItemAnimation.dart';
 import 'package:user/component/Item_tile2.dart';
 import 'package:user/component/bootm_nav_bar.dart';
 import 'package:user/component/item_tile1.dart';
 import 'package:user/component/scroll_list_tile.dart';
 import 'package:user/component/search_bar.dart';
+import 'package:user/component/shopping_cart_icon.dart';
 import 'package:user/component/store_tile.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:user/blocs/shopping_cart_bloc.dart';
 
 import '../Backgrounds/backgound_1.dart';
 
@@ -78,7 +85,10 @@ class _HomePageState extends State<HomePage> {
                             top: 0,
                             left: 0,
                             right: 0,
-                            child: FirstBackGround(ScreenHeight: height),
+                            child: FirstBackGround(
+                              ScreenHeight: height,
+                              color: Color(0xFF013033),
+                            ),
                           ),
                           Positioned(
                             top: -(height / 2) / 2,
@@ -122,22 +132,19 @@ class _HomePageState extends State<HomePage> {
                                   CustomSearchBar(width: width),
                                   const SizedBox(width: 12),
                                   GestureDetector(
-                                    child: Container(
-                                      key: _cartKey,
-                                      height: 50,
-                                      width: 50,
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.circular(35),
-                                      ),
-                                      child: Center(
-                                        child: Image.asset(
-                                          "assets/icons/shopping-cart.png",
-                                          height: 30,
-                                          width: 30,
-                                          fit: BoxFit.cover,
-                                        ),
-                                      ),
+                                    onTap: () => Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => CartPage(),
+                                        )),
+                                    child: BlocBuilder<ShoppingCartBloc,
+                                        ShoppingCartState>(
+                                      builder: (context, state) {
+                                        return ShoppingCartIcon(
+                                          cartKey: _cartKey,
+                                          itemCount: state.cartItems.length,
+                                        );
+                                      },
                                     ),
                                   ),
                                 ],
@@ -198,7 +205,7 @@ class _HomePageState extends State<HomePage> {
                               key: itemKey,
                               imageName: globalProductsList[index].imageName,
                               name: globalProductsList[index].name,
-                              shopName: globalProductsList[index].shop,
+                              shopName: globalProductsList[index].shop.name,
                               weight: globalProductsList[index].weight,
                               price: globalProductsList[index].price,
                               active: true,
@@ -213,6 +220,13 @@ class _HomePageState extends State<HomePage> {
                                 );
                               },
                               onTapCurvedButton: () {
+                                context.read<ShoppingCartBloc>().add(
+                                      AddProduct(
+                                        ShoppingCartItem(
+                                            product: globalProductsList[index],
+                                            quantity: 1),
+                                      ),
+                                    );
                                 _startAddToCartAnimation(itemKey);
                               },
                             ),
@@ -277,15 +291,26 @@ class _HomePageState extends State<HomePage> {
                       height: 230,
                       child: ListView.builder(
                         scrollDirection: Axis.horizontal,
-                        itemCount: 8,
+                        itemCount: globalShopsList.length,
                         itemBuilder: (context, index) {
-                          return Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 12.0),
-                            child: StoreTile(
-                              storeImage: "assets/icons/shopping-cart.png",
-                              storeName: "T&T Food Market",
-                              time: "12 minute",
+                          return GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => StorePage(
+                                      store: globalShopsList[index],
+                                    ),
+                                  ));
+                            },
+                            child: Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 12.0),
+                              child: StoreTile(
+                                storeImage: globalShopsList[index].imageUrl,
+                                storeName: globalShopsList[index].name,
+                                time: "12 minute",
+                              ),
                             ),
                           );
                         },

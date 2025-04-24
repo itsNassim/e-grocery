@@ -222,7 +222,7 @@ class _LikesPageProductsState extends State<LikesPageProducts> {
                             return ItemTile1(
                               imageName: widget.productList[index].imageName,
                               name: widget.productList[index].name,
-                              shopName: widget.productList[index].shop,
+                              shopName: widget.productList[index].shop.name,
                               weight: widget.productList[index].weight,
                               price: widget.productList[index].price,
                               active: false,

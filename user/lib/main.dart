@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:user/Pages/main_page.dart';
 import 'package:user/authuntication/log_in.dart';
+import 'package:user/blocs/shopping_cart_bloc.dart';
 import 'Pages/home_page.dart';
 
 void main() {
@@ -12,14 +14,17 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Color(0xFF013033)),
-        useMaterial3: true,
+    return BlocProvider(
+      create: (_) => ShoppingCartBloc(),
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: 'Flutter Demo',
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: Color(0xFF013033)),
+          useMaterial3: true,
+        ),
+        home: MainPage(),
       ),
-      home: MainPage(),
     );
   }
 }

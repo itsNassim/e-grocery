@@ -56,9 +56,10 @@ class StoreTile extends StatelessWidget {
                   width: 3,
                 ),
                 borderRadius: BorderRadius.circular(25),
-                color: Colors.grey,
+                color: Colors.white,
               ),
               child: ClipRRect(
+                borderRadius: BorderRadius.circular(20),
                 child: Image.asset(
                   storeImage,
                   height: 50,

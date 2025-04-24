@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:user/Backgrounds/backgound_1.dart';
 import 'package:user/Pages/likes_page_products.dart';
+import 'package:user/blocs/shopping_cart_bloc.dart';
 import 'package:user/classes/likesList_class.dart';
 import 'package:user/component/liked_page_containe.dart';
 import 'package:user/component/likes_page_products_tile.dart';
 import 'package:user/component/search_bar.dart';
+import 'package:user/component/shopping_cart_icon.dart';
 
 class LikesPage extends StatefulWidget {
   const LikesPage({super.key});
@@ -78,7 +81,10 @@ class _LikesPageState extends State<LikesPage> {
                         top: 0,
                         left: 0,
                         right: 0,
-                        child: FirstBackGround(ScreenHeight: height),
+                        child: FirstBackGround(
+                          ScreenHeight: height,
+                          color: Color(0xFF013033),
+                        ),
                       ),
                       Positioned(
                         top: 20,
@@ -90,21 +96,13 @@ class _LikesPageState extends State<LikesPage> {
                               CustomSearchBar(width: width),
                               const SizedBox(width: 12),
                               GestureDetector(
-                                child: Container(
-                                  height: 50,
-                                  width: 50,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(35),
-                                  ),
-                                  child: Center(
-                                    child: Image.asset(
-                                      "assets/icons/shopping-cart.png",
-                                      height: 30,
-                                      width: 30,
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
+                                child: BlocBuilder<ShoppingCartBloc,
+                                    ShoppingCartState>(
+                                  builder: (context, state) {
+                                    return ShoppingCartIcon(
+                                      itemCount: state.cartItems.length,
+                                    );
+                                  },
                                 ),
                               ),
                             ],

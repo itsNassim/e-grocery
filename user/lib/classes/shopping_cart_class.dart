@@ -1,11 +1,11 @@
 import 'package:user/classes/products_class.dart';
 
-class ShoppingCart {
-  final String title;
-  final List<Product> productsList;
+class ShoppingCartItem {
+  final Product product;
+  final int quantity;
 
-  ShoppingCart({
-    required this.title,
-    required this.productsList,
+  ShoppingCartItem({
+    required this.product,
+    required this.quantity,
   });
 }

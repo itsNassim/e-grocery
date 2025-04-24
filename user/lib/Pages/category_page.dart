@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:user/Backgrounds/backgound_1.dart';
 import 'package:user/Pages/products_page.dart';
+import 'package:user/blocs/shopping_cart_bloc.dart';
 import 'package:user/classes/category_class.dart';
 import 'package:user/component/Item_tile2.dart' show ItemTile2;
 import 'package:user/component/bootm_nav_bar.dart';
 import 'package:user/component/category_tile.dart';
 import 'package:user/component/search_bar.dart';
+import 'package:user/component/shopping_cart_icon.dart';
 
 class CategoryPage extends StatefulWidget {
   const CategoryPage({super.key});
@@ -38,7 +41,10 @@ class _CategoryPageState extends State<CategoryPage> {
                         top: 0,
                         left: 0,
                         right: 0,
-                        child: FirstBackGround(ScreenHeight: height / 1.2),
+                        child: FirstBackGround(
+                          ScreenHeight: height / 1.2,
+                          color: Color(0xFF013033),
+                        ),
                       ),
                       Positioned(
                         top: 20,
@@ -52,21 +58,13 @@ class _CategoryPageState extends State<CategoryPage> {
                                 width: 12,
                               ),
                               GestureDetector(
-                                child: Container(
-                                  height: 50,
-                                  width: 50,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(35),
-                                  ),
-                                  child: Center(
-                                    child: Image.asset(
-                                      "assets/icons/shopping-cart.png",
-                                      height: 30,
-                                      width: 30,
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
+                                child: BlocBuilder<ShoppingCartBloc,
+                                    ShoppingCartState>(
+                                  builder: (context, state) {
+                                    return ShoppingCartIcon(
+                                      itemCount: state.cartItems.length,
+                                    );
+                                  },
                                 ),
                               )
                             ],
