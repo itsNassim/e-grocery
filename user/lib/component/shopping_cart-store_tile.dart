@@ -22,25 +22,17 @@ class ShoppingCartStoreTile extends StatefulWidget {
 class _ShoppingCartStoreTileState extends State<ShoppingCartStoreTile>
     with TickerProviderStateMixin {
   bool showList = false;
-  final List<GlobalKey> collapsedKeys = [];
-  final List<GlobalKey> expandedKeys = [];
 
   late final AnimationController _controller;
-  late final Animation<double> _animation;
 
   @override
   void initState() {
     super.initState();
-    collapsedKeys
-        .addAll(List.generate(widget.shopItems.length, (_) => GlobalKey()));
-    expandedKeys
-        .addAll(List.generate(widget.shopItems.length, (_) => GlobalKey()));
 
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 500),
     );
-    _animation = CurvedAnimation(parent: _controller, curve: Curves.easeInOut);
   }
 
   @override
@@ -143,12 +135,10 @@ class _ShoppingCartStoreTileState extends State<ShoppingCartStoreTile>
                   padding: const EdgeInsets.all(12),
                   child: Column(
                     children: widget.shopItems.asMap().entries.map((entry) {
-                      final index = entry.key;
                       final item = entry.value;
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 12),
                         child: Container(
-                          key: expandedKeys[index],
                           child: ShoppingCartItemTile(
                             cartItem: item,
                             increment: () {
@@ -159,6 +149,11 @@ class _ShoppingCartStoreTileState extends State<ShoppingCartStoreTile>
                             decrement: () {
                               context.read<ShoppingCartBloc>().add(
                                     DecrementProduct(item.product),
+                                  );
+                            },
+                            onPressed: (p0) {
+                              context.read<ShoppingCartBloc>().add(
+                                    RemoveProduct(item),
                                   );
                             },
                           ),
@@ -178,7 +173,6 @@ class _ShoppingCartStoreTileState extends State<ShoppingCartStoreTile>
                     itemBuilder: (context, index) {
                       final item = widget.shopItems[index];
                       return Container(
-                        key: collapsedKeys[index],
                         height: 40,
                         width: 40,
                         decoration: BoxDecoration(

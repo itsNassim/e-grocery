@@ -16,26 +16,9 @@ class CartPage extends StatefulWidget {
 
 class _CartPageState extends State<CartPage> {
   late ScrollController _scrollController;
-  int? selectedIndex;
-  int quantity = 1;
   bool _hasPopped = false;
-  bool isFavorite = false;
   bool emptyCart = false;
   double total = 0;
-
-  void _increase() {
-    setState(() {
-      quantity++;
-    });
-  }
-
-  void _decrease() {
-    if (quantity > 1) {
-      setState(() {
-        quantity--;
-      });
-    }
-  }
 
   Widget _buildTotalRow(String label, double value, {bool isBold = false}) {
     return Row(
@@ -113,6 +96,11 @@ class _CartPageState extends State<CartPage> {
                     BlocBuilder<ShoppingCartBloc, ShoppingCartState>(
                       builder: (context, state) {
                         if (state.cartItems.isEmpty) {
+                          WidgetsBinding.instance.addPostFrameCallback((_) {
+                            setState(() {
+                              total = 0;
+                            });
+                          });
                           return SizedBox(
                             height: height * 0.65,
                             child: Center(
@@ -243,7 +231,6 @@ class _CartPageState extends State<CartPage> {
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 12.0),
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Container(
                             height: 50,
@@ -265,30 +252,15 @@ class _CartPageState extends State<CartPage> {
                               ),
                             ),
                           ),
+                          SizedBox(
+                            width: width * 0.21,
+                          ),
                           const Text(
                             "Product Detail",
                             style: TextStyle(
                               fontSize: 24,
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
-                            ),
-                          ),
-                          GestureDetector(
-                            child: Container(
-                              height: 50,
-                              width: 50,
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(35),
-                              ),
-                              child: Center(
-                                child: Image.asset(
-                                  "assets/icons/shopping-cart.png",
-                                  height: 30,
-                                  width: 30,
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
                             ),
                           ),
                         ],
@@ -346,37 +318,6 @@ class _CartPageState extends State<CartPage> {
                 ),
               ),
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget _iconButton(String text, void Function() onPressed) {
-    return Container(
-      height: 30,
-      width: 30,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        border: Border.all(
-          width: 2,
-          color: Color(0xff7C9D8C),
-          strokeAlign: BorderSide.strokeAlignInside,
-        ),
-      ),
-      child: Center(
-        child: TextButton(
-          onPressed: onPressed,
-          child: Text(
-            text,
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Color(0xff7C9D8C),
-            ),
-          ),
-          style: TextButton.styleFrom(
-            padding: EdgeInsets.zero,
-          ),
         ),
       ),
     );

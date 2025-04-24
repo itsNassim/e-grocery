@@ -28,7 +28,6 @@ class _CurvedButtonState extends State<CurvedButton> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     if (widget.active) {
       isQuantitySelector = false;
