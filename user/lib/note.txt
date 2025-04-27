@@ -1,2 +1,3 @@
 cart page - cart logic - payment
 profile page  - settings - orders status
+store tile 2 in detail page

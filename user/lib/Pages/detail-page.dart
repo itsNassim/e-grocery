@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:user/Backgrounds/background_2.dart';
+import 'package:user/Pages/cart_page.dart';
+import 'package:user/blocs/shopping_cart_bloc.dart';
 import 'package:user/classes/likesList_class.dart';
 import 'package:user/classes/products_class.dart';
+import 'package:user/classes/shopping_cart_class.dart';
 import 'package:user/component/liked_page_containe2.dart';
 import 'package:user/component/read_more_text.dart';
+import 'package:user/component/shopping_cart_icon.dart';
 import 'package:user/component/stote_tile2.dart';
 
 class DetailPage extends StatefulWidget {
@@ -53,6 +58,8 @@ class _DetailPageState extends State<DetailPage> {
                   final newList =
                       Likeslist(title: name, productsList: [widget.product]);
                   golobalLikesList.add(newList);
+                  Navigator.pop(context);
+                  Navigator.pop(context, true);
                 });
               },
               onAdd: (index) {
@@ -205,7 +212,6 @@ class _DetailPageState extends State<DetailPage> {
                               if (!isFavorite) {
                                 _showFullScreenBottomSheet(context);
                               } else {
-                                // Optional: Remove product from all lists and unfavorite
                                 setState(() {
                                   for (var list in golobalLikesList) {
                                     list.productsList.remove(widget.product);
@@ -348,21 +354,18 @@ class _DetailPageState extends State<DetailPage> {
                             ),
                           ),
                           GestureDetector(
-                            child: Container(
-                              height: 50,
-                              width: 50,
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(35),
-                              ),
-                              child: Center(
-                                child: Image.asset(
-                                  "assets/icons/shopping-cart.png",
-                                  height: 30,
-                                  width: 30,
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
+                            onTap: () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => CartPage(),
+                                )),
+                            child: BlocBuilder<ShoppingCartBloc,
+                                ShoppingCartState>(
+                              builder: (context, state) {
+                                return ShoppingCartIcon(
+                                  itemCount: state.cartItems.length,
+                                );
+                              },
                             ),
                           ),
                         ],
@@ -410,38 +413,50 @@ class _DetailPageState extends State<DetailPage> {
                         ),
                       ),
                     ),
-                    Container(
-                        height: 50,
-                        width: width / 2 - 30,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(25),
-                          color: Color(0xffBBEA70),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              SizedBox(
-                                width: 20,
+                    GestureDetector(
+                      onTap: () {
+                        context.read<ShoppingCartBloc>().add(
+                              AddProduct(
+                                ShoppingCartItem(
+                                    product: widget.product,
+                                    quantity: quantity),
                               ),
-                              Icon(
-                                Icons.shopping_cart_outlined,
-                                color: Color(0xff146139),
-                                size: 30,
-                              ),
-                              Text(
-                                "Add to cart",
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                  color: Color(0xff146139),
-                                ),
-                              ),
-                            ],
+                            );
+                      },
+                      child: Container(
+                          height: 50,
+                          width: width / 2 - 30,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(25),
+                            color: Color(0xffBBEA70),
                           ),
-                        ))
+                          child: Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 8.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                SizedBox(
+                                  width: 20,
+                                ),
+                                Icon(
+                                  Icons.shopping_cart_outlined,
+                                  color: Color(0xff146139),
+                                  size: 30,
+                                ),
+                                Text(
+                                  "Add to cart",
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xff146139),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )),
+                    )
                   ],
                 ),
               ),

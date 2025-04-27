@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:user/Backgrounds/backgound_1.dart';
+
+import 'package:user/Pages/cart_page.dart';
 import 'package:user/Pages/likes_page_products.dart';
+
 import 'package:user/blocs/shopping_cart_bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
 import 'package:user/classes/likesList_class.dart';
+
 import 'package:user/component/liked_page_containe.dart';
 import 'package:user/component/likes_page_products_tile.dart';
 import 'package:user/component/search_bar.dart';
@@ -38,6 +43,7 @@ class _LikesPageState extends State<LikesPage> {
             setState(() {
               final newList = Likeslist(title: name, productsList: []);
               golobalLikesList.add(newList);
+              Navigator.pop(context);
             });
           },
         );
@@ -50,9 +56,8 @@ class _LikesPageState extends State<LikesPage> {
     return golobalLikesList.map((list) {
       return ProductsTile(
         width: width,
-        Name: list.title,
-        counter: list.productsList.length,
-        productsList: list.productsList,
+        item: list,
+        onPressed: (p0) {},
       );
     }).toList();
   }
@@ -96,6 +101,11 @@ class _LikesPageState extends State<LikesPage> {
                               CustomSearchBar(width: width),
                               const SizedBox(width: 12),
                               GestureDetector(
+                                onTap: () => Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => CartPage(),
+                                    )),
                                 child: BlocBuilder<ShoppingCartBloc,
                                     ShoppingCartState>(
                                   builder: (context, state) {
@@ -199,9 +209,7 @@ class _LikesPageState extends State<LikesPage> {
                               context,
                               MaterialPageRoute(
                                 builder: (context) => LikesPageProducts(
-                                  title: golobalLikesList[index].title,
-                                  productList:
-                                      golobalLikesList[index].productsList,
+                                  item: golobalLikesList[index],
                                 ),
                               ));
                         },

@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:user/Backgrounds/backgound_1.dart';
+import 'package:user/Pages/cart_page.dart';
 import 'package:user/Pages/products_page.dart';
 import 'package:user/blocs/shopping_cart_bloc.dart';
 import 'package:user/classes/category_class.dart';
-import 'package:user/component/Item_tile2.dart' show ItemTile2;
-import 'package:user/component/bootm_nav_bar.dart';
 import 'package:user/component/category_tile.dart';
 import 'package:user/component/search_bar.dart';
 import 'package:user/component/shopping_cart_icon.dart';
@@ -58,6 +57,11 @@ class _CategoryPageState extends State<CategoryPage> {
                                 width: 12,
                               ),
                               GestureDetector(
+                                onTap: () => Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => CartPage(),
+                                    )),
                                 child: BlocBuilder<ShoppingCartBloc,
                                     ShoppingCartState>(
                                   builder: (context, state) {
@@ -66,7 +70,7 @@ class _CategoryPageState extends State<CategoryPage> {
                                     );
                                   },
                                 ),
-                              )
+                              ),
                             ],
                           ),
                         ),
@@ -106,8 +110,7 @@ class _CategoryPageState extends State<CategoryPage> {
                     itemBuilder: (context, index) {
                       return CategoryTile(
                         width: width,
-                        category: GolbelCategoryList[index].name,
-                        imageUrl: GolbelCategoryList[index].imageName,
+                        category: GolbelCategoryList[index],
                         onTap: () {
                           Navigator.push(
                               context,

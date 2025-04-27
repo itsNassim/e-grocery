@@ -45,9 +45,8 @@ class _LikedPageContaineState extends State<LikedPageContaine2> {
     return golobalLikesList.map((list) {
       return ProductsTile(
         width: width,
-        Name: list.title,
-        counter: list.productsList.length,
-        productsList: list.productsList,
+        item: list,
+        onPressed: (p0) {},
       );
     }).toList();
   }
@@ -132,9 +131,7 @@ class _LikedPageContaineState extends State<LikedPageContaine2> {
                       child: Padding(
                         padding: const EdgeInsets.symmetric(vertical: 8.0),
                         child: ProductsTile2(
-                          Name: productTiles[index].Name,
-                          counter: productTiles[index].counter,
-                          productsList: productTiles[index].productsList,
+                          item: productTiles[index].item,
                           width: widget.width,
                         ),
                       ),

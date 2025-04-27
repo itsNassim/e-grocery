@@ -152,8 +152,6 @@ class _LikedPageContaineState extends State<LikedPageContaine> {
                 onTap: () {
                   if (_controller.text.isNotEmpty) {
                     widget.onCreate?.call(_controller.text);
-                    Navigator.pop(context);
-                    Navigator.pop(context, true);
                   }
                 },
                 child: Container(

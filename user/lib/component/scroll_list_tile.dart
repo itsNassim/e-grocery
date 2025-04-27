@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:user/classes/category_class.dart';
 
 class ScrollListTile extends StatelessWidget {
-  final String title;
-  final String imageName;
+  final Category category;
   ScrollListTile({
     super.key,
-    required this.title,
-    required this.imageName,
+    required this.category,
   });
 
   @override
@@ -27,7 +26,7 @@ class ScrollListTile extends StatelessWidget {
             child: Center(
               child: ClipRRect(
                 child: Image.asset(
-                  imageName,
+                  category.imageName,
                   height: 50,
                   width: 50,
                   fit: BoxFit.cover,
@@ -37,7 +36,7 @@ class ScrollListTile extends StatelessWidget {
           ),
           SizedBox(height: 3),
           Text(
-            title,
+            category.name,
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 16,

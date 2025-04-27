@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:user/Pages/category_page.dart';
 import 'package:user/Pages/home_page.dart';
 import 'package:user/Pages/likes_page.dart';
+import 'package:user/Pages/profile_page.dart';
 import 'package:user/component/bootm_nav_bar.dart';
 
 class MainPage extends StatefulWidget {
@@ -18,7 +19,7 @@ class _MainPageState extends State<MainPage> {
     HomePage(),
     CategoryPage(),
     LikesPage(),
-    Placeholder(),
+    ProfilePage(),
   ];
 
   @override

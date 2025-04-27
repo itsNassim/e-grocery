@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:user/classes/shop_class.dart';
 
 class StoreTile extends StatelessWidget {
-  final String storeImage;
-  final String storeName;
+  final ShopClass store;
   final String time;
   StoreTile({
     super.key,
-    required this.storeImage,
-    required this.storeName,
+    required this.store,
     required this.time,
   });
 
@@ -61,7 +60,7 @@ class StoreTile extends StatelessWidget {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(20),
                 child: Image.asset(
-                  storeImage,
+                  store.imageUrl,
                   height: 50,
                   width: 50,
                   fit: BoxFit.cover,
@@ -77,7 +76,7 @@ class StoreTile extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    storeName,
+                    store.name,
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                   SizedBox(

@@ -1,0 +1,27 @@
+### SIGN UP
+POST http://127.0.0.1:8000/api/signup/
+Content-Type: application/json
+
+{
+  "email": "testuser1@examplle.com",
+  "full_name": "Test User",
+  "phone_number": "1234567890",
+  "password": "strongpassword123"
+}
+
+### LOGIN
+POST http://127.0.0.1:8000/api/login/
+Content-Type: application/json
+
+{
+  "email": "testuser1@example.com",
+  "password": "strongpassword123"
+}
+
+### PROTECTED ENDPOINT (Example)
+POST http://127.0.0.1:8000/api/refresh/
+Content-Type: application/json
+
+{
+  "refresh": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc0NTcxNTM0OCwiaWF0IjoxNzQ1NjI4OTQ4LCJqdGkiOiIwMTAyN2M4MjUxYTM0OTM4YjRlMjI5OThmNTQzMmI2YyIsInVzZXJfaWQiOjF9.nmYaZWPvjmmMKuiDX60dpGfTg6OUoD_mU6lmSTgtvDo"
+}

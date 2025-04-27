@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:user/classes/category_class.dart';
 
 // ignore: must_be_immutable
 class CategoryTile extends StatelessWidget {
   final double width;
-  final String category;
-  final String imageUrl;
+  final Category category;
+
   void Function()? onTap;
   CategoryTile({
     super.key,
     required this.width,
     required this.category,
-    required this.imageUrl,
     required this.onTap,
   });
 
@@ -33,7 +33,7 @@ class CategoryTile extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.all(11.0),
                 child: Text(
-                  category,
+                  category.name,
                   style: TextStyle(
                     fontSize: 19,
                     fontWeight: FontWeight.bold,
@@ -46,7 +46,7 @@ class CategoryTile extends StatelessWidget {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(12),
                 child: Image.asset(
-                  imageUrl,
+                  category.imageName,
                   height: 90,
                   width: 100,
                   fit: BoxFit.cover,

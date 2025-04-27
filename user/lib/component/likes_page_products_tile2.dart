@@ -1,18 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:user/classes/likesList_class.dart';
 import 'package:user/classes/products_class.dart';
 
 class ProductsTile2 extends StatefulWidget {
-  double width;
-  String Name;
-  int counter;
-  List<Product> productsList;
+  final double width;
+  final Likeslist item;
 
   ProductsTile2({
     super.key,
     required this.width,
-    required this.Name,
-    required this.counter,
-    required this.productsList,
+    required this.item,
   });
 
   @override
@@ -44,9 +41,9 @@ class eProductsTileState extends State<ProductsTile2> {
                   color: Colors.grey[200],
                 ),
                 child: Center(
-                  child: widget.productsList.length > 0
+                  child: widget.item.productsList.length > 0
                       ? Image.asset(
-                          widget.productsList[0].imageName,
+                          widget.item.productsList[0].imageName,
                           height: 200,
                           width: widget.width * 0.28,
                           fit: BoxFit.cover,
@@ -62,7 +59,7 @@ class eProductsTileState extends State<ProductsTile2> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    widget.Name,
+                    widget.item.title,
                     style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                   ),
                   SizedBox(
@@ -75,7 +72,7 @@ class eProductsTileState extends State<ProductsTile2> {
                         color: Colors.black45,
                       ),
                       Text(
-                        "${widget.counter} item",
+                        "${widget.item.productsList.length} item",
                         style: TextStyle(
                             color: Colors.black45, fontWeight: FontWeight.w700),
                       )

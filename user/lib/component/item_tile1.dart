@@ -1,35 +1,32 @@
 import 'package:flutter/material.dart';
+import 'package:user/classes/products_class.dart';
 import 'package:user/component/curved_button.dart';
 
-// ignore: must_be_immutable
-class ItemTile1 extends StatelessWidget {
-  final String imageName;
-  final String name;
-  final String shopName;
-  final String weight;
-  final String price;
+class ItemTile1 extends StatefulWidget {
+  final Product product;
   final bool active;
-  void Function()? onTap;
-  void Function()? onTapCurvedButton;
+  final void Function()? onTap;
+  final Function()? onTapCurvedButton;
 
-  ItemTile1({
+  const ItemTile1({
     super.key,
-    required this.imageName,
-    required this.name,
-    required this.shopName,
-    required this.weight,
-    required this.price,
+    required this.product,
     required this.active,
     required this.onTap,
     required this.onTapCurvedButton,
   });
 
   @override
+  State<ItemTile1> createState() => _ItemTile1State();
+}
+
+class _ItemTile1State extends State<ItemTile1> {
+  @override
   Widget build(BuildContext context) {
-    List<String> parts = price.split(".");
+    List<String> parts = widget.product.price.split(".");
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
-      onTap: onTap,
+      onTap: widget.onTap,
       child: ClipPath(
         clipper: CustomBottomClipper(),
         child: Container(
@@ -51,14 +48,14 @@ class ItemTile1 extends StatelessWidget {
                   children: [
                     ClipRRect(
                       child: Image.asset(
-                        imageName,
+                        widget.product.imageName,
                         height: 100,
                         width: 100,
                         fit: BoxFit.cover,
                       ),
                     ),
                     Text(
-                      name,
+                      widget.product.name,
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -67,7 +64,7 @@ class ItemTile1 extends StatelessWidget {
                     FittedBox(
                       fit: BoxFit.scaleDown,
                       child: Text(
-                        "(${shopName})",
+                        "(${widget.product.shop.name})",
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -75,7 +72,7 @@ class ItemTile1 extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      "$weight g",
+                      "${widget.product.weight} g",
                       style: const TextStyle(
                         color: Colors.grey,
                         fontSize: 14,
@@ -97,7 +94,7 @@ class ItemTile1 extends StatelessWidget {
                           Padding(
                             padding: const EdgeInsets.only(top: 4),
                             child: Text(
-                              (parts.length > 1 ? parts[1] : "00") + "\$",
+                              (parts.length > 1 ? parts[1] : "00") + "DA",
                               style: const TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold,
@@ -109,12 +106,10 @@ class ItemTile1 extends StatelessWidget {
                     ),
                   ],
                 ),
-
-                /// Prevent gesture from propagating up when button is pressed
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8.0),
                   child: GestureDetector(
-                    onTap: onTapCurvedButton,
+                    onTap: widget.onTapCurvedButton,
                     behavior: HitTestBehavior.translucent,
                     child: SizedBox(
                       height: 60,
@@ -124,8 +119,9 @@ class ItemTile1 extends StatelessWidget {
                         width: 150,
                         icon: Icons.add,
                         color: const Color.fromARGB(255, 226, 239, 218),
-                        active: active,
-                        onTap: onTapCurvedButton,
+                        active: widget.active,
+                        onTap: widget.onTapCurvedButton,
+                        product: widget.product,
                       ),
                     ),
                   ),

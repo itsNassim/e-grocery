@@ -30,6 +30,8 @@ class DecrementProduct extends ShoppingCartEvent {
   DecrementProduct(this.product);
 }
 
+class RefreshCart extends ShoppingCartEvent {} // 👈 Optional for manual refresh
+
 class ShoppingCartBloc extends Bloc<ShoppingCartEvent, ShoppingCartState> {
   ShoppingCartBloc() : super(ShoppingCartState([])) {
     on<AddProduct>((event, emit) {
@@ -67,6 +69,10 @@ class ShoppingCartBloc extends Bloc<ShoppingCartEvent, ShoppingCartState> {
           .where((item) => item.quantity > 0)
           .toList();
       emit(ShoppingCartState(updated));
+    });
+
+    on<RefreshCart>((event, emit) {
+      emit(ShoppingCartState(state.cartItems)); // re-emit same state
     });
   }
 }

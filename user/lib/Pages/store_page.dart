@@ -1,16 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:user/Backgrounds/backgound_1.dart';
+import 'package:user/Pages/cart_page.dart';
 import 'package:user/Pages/detail-page.dart';
 import 'package:user/Pages/products_page.dart';
+import 'package:user/blocs/shopping_cart_bloc.dart';
 import 'package:user/classes/category_class.dart';
 import 'package:user/classes/products_class.dart';
 import 'package:user/classes/review_class.dart';
 import 'package:user/classes/shop_class.dart';
+import 'package:user/classes/shopping_cart_class.dart';
 import 'package:user/classes/user_class.dart';
 import 'package:user/component/FlyingItemAnimation.dart';
 import 'package:user/component/Item_tile1.dart';
 import 'package:user/component/scroll_list_tile.dart';
 import 'package:user/component/search_bar.dart';
+import 'package:user/component/shopping_cart_icon.dart';
 import 'package:user/component/store_tile3.dart';
 import 'package:user/component/stote_tile2.dart';
 
@@ -131,22 +136,19 @@ class _StorePageState extends State<StorePage> {
                                     ),
                                   ),
                                   GestureDetector(
-                                    child: Container(
-                                      key: _cartKey,
-                                      height: 50,
-                                      width: 50,
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.circular(35),
-                                      ),
-                                      child: Center(
-                                        child: Image.asset(
-                                          "assets/icons/shopping-cart.png",
-                                          height: 30,
-                                          width: 30,
-                                          fit: BoxFit.cover,
-                                        ),
-                                      ),
+                                    onTap: () => Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => CartPage(),
+                                        )),
+                                    child: BlocBuilder<ShoppingCartBloc,
+                                        ShoppingCartState>(
+                                      builder: (context, state) {
+                                        return ShoppingCartIcon(
+                                          cartKey: _cartKey,
+                                          itemCount: state.cartItems.length,
+                                        );
+                                      },
                                     ),
                                   ),
                                 ],
@@ -223,8 +225,7 @@ class _StorePageState extends State<StorePage> {
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: ScrollListTile(
-                                imageName: GolbelCategoryList[index].imageName,
-                                title: GolbelCategoryList[index].name,
+                                category: GolbelCategoryList[index],
                               ),
                             ),
                           );
@@ -262,11 +263,7 @@ class _StorePageState extends State<StorePage> {
                                 const EdgeInsets.symmetric(horizontal: 12.0),
                             child: ItemTile1(
                               key: itemKey,
-                              imageName: globalProductsList[index].imageName,
-                              name: globalProductsList[index].name,
-                              shopName: globalProductsList[index].shop.name,
-                              weight: globalProductsList[index].weight,
-                              price: globalProductsList[index].price,
+                              product: globalProductsList[index],
                               active: true,
                               onTap: () {
                                 Navigator.push(
@@ -279,6 +276,13 @@ class _StorePageState extends State<StorePage> {
                                 );
                               },
                               onTapCurvedButton: () {
+                                context.read<ShoppingCartBloc>().add(
+                                      AddProduct(
+                                        ShoppingCartItem(
+                                            product: globalProductsList[index],
+                                            quantity: 1),
+                                      ),
+                                    );
                                 _startAddToCartAnimation(itemKey);
                               },
                             ),

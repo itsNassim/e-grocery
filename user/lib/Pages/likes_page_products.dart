@@ -1,20 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
+
 import 'package:user/Backgrounds/background_2.dart';
+import 'package:user/Pages/cart_page.dart';
+
 import 'package:user/Pages/detail-page.dart';
 import 'package:user/Pages/products_page.dart';
-import 'package:user/classes/products_class.dart';
-import 'package:user/component/Item_tile1.dart';
-import 'package:user/component/read_more_text.dart';
-import 'package:user/component/stote_tile2.dart'; // Assuming this shows product tiles
+import 'package:user/blocs/shopping_cart_bloc.dart';
+
+import 'package:user/classes/likesList_class.dart';
+
+import 'package:user/component/item_tile1.dart';
+import 'package:user/component/shopping_cart_icon.dart';
 
 class LikesPageProducts extends StatefulWidget {
-  final String title;
-  final List<Product> productList;
+  final Likeslist item;
 
   LikesPageProducts({
     super.key,
-    required this.title,
-    required this.productList,
+    required this.item,
   });
 
   @override
@@ -108,7 +113,7 @@ class _LikesPageProductsState extends State<LikesPageProducts> {
                                     ),
                                   ),
                                   Text(
-                                    widget.title,
+                                    widget.item.title,
                                     style: const TextStyle(
                                       fontSize: 24,
                                       fontWeight: FontWeight.bold,
@@ -116,21 +121,18 @@ class _LikesPageProductsState extends State<LikesPageProducts> {
                                     ),
                                   ),
                                   GestureDetector(
-                                    child: Container(
-                                      height: 50,
-                                      width: 50,
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.circular(35),
-                                      ),
-                                      child: Center(
-                                        child: Image.asset(
-                                          "assets/icons/shopping-cart.png",
-                                          height: 30,
-                                          width: 30,
-                                          fit: BoxFit.cover,
-                                        ),
-                                      ),
+                                    onTap: () => Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => CartPage(),
+                                        )),
+                                    child: BlocBuilder<ShoppingCartBloc,
+                                        ShoppingCartState>(
+                                      builder: (context, state) {
+                                        return ShoppingCartIcon(
+                                          itemCount: state.cartItems.length,
+                                        );
+                                      },
                                     ),
                                   ),
                                 ],
@@ -155,7 +157,7 @@ class _LikesPageProductsState extends State<LikesPageProducts> {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 12.0),
                       child: GridView.builder(
-                        itemCount: widget.productList.length + 1,
+                        itemCount: widget.item.productsList.length + 1,
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
                         gridDelegate:
@@ -166,7 +168,7 @@ class _LikesPageProductsState extends State<LikesPageProducts> {
                           childAspectRatio: 0.47,
                         ),
                         itemBuilder: (context, index) {
-                          if (index == widget.productList.length) {
+                          if (index == widget.item.productsList.length) {
                             return GestureDetector(
                               onTap: () => Navigator.push(
                                   context,
@@ -219,24 +221,37 @@ class _LikesPageProductsState extends State<LikesPageProducts> {
                               ),
                             );
                           } else {
-                            return ItemTile1(
-                              imageName: widget.productList[index].imageName,
-                              name: widget.productList[index].name,
-                              shopName: widget.productList[index].shop.name,
-                              weight: widget.productList[index].weight,
-                              price: widget.productList[index].price,
-                              active: false,
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => DetailPage(
-                                      product: widget.productList[index],
+                            return Slidable(
+                              endActionPane: ActionPane(
+                                motion: StretchMotion(),
+                                children: [
+                                  SlidableAction(
+                                    onPressed: (context) {},
+                                    icon: Icons.delete,
+                                    backgroundColor: Colors.red,
+                                    borderRadius: BorderRadius.only(
+                                      topRight: Radius.circular(12.0),
+                                      bottomRight: Radius.circular(12.0),
                                     ),
                                   ),
-                                );
-                              },
-                              onTapCurvedButton: () {},
+                                ],
+                              ),
+                              child: ItemTile1(
+                                product: widget.item.productsList[index],
+                                active: false,
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => DetailPage(
+                                        product:
+                                            widget.item.productsList[index],
+                                      ),
+                                    ),
+                                  );
+                                },
+                                onTapCurvedButton: () {},
+                              ),
                             );
                           }
                         },

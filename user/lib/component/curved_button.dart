@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:user/blocs/shopping_cart_bloc.dart';
+import 'package:user/classes/products_class.dart';
+import 'package:user/classes/shopping_cart_class.dart';
 
 class CurvedButton extends StatefulWidget {
   final double height;
@@ -7,6 +11,7 @@ class CurvedButton extends StatefulWidget {
   final Color color;
   final bool active;
   final void Function()? onTap;
+  final Product product;
 
   const CurvedButton({
     super.key,
@@ -15,6 +20,7 @@ class CurvedButton extends StatefulWidget {
     required this.icon,
     required this.color,
     required this.active,
+    required this.product,
     this.onTap,
   });
 
@@ -24,16 +30,25 @@ class CurvedButton extends StatefulWidget {
 
 class _CurvedButtonState extends State<CurvedButton> {
   late bool isQuantitySelector;
-  int quantity = 1;
 
   @override
   void initState() {
     super.initState();
-    if (widget.active) {
-      isQuantitySelector = false;
-    } else {
-      isQuantitySelector = true;
-    }
+
+    isQuantitySelector = !widget.active;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final cartItems = context.read<ShoppingCartBloc>().state.cartItems;
+
+      for (var list in cartItems) {
+        if (list.product == widget.product) {
+          setState(() {
+            isQuantitySelector = true;
+          });
+          break;
+        }
+      }
+    });
   }
 
   void _toggleToQuantitySelector() {
@@ -46,23 +61,28 @@ class _CurvedButtonState extends State<CurvedButton> {
   }
 
   void _increase() {
-    setState(() {
-      quantity++;
-    });
+    context.read<ShoppingCartBloc>().add(IncrementProduct(widget.product));
   }
 
-  void _decrease() {
+  void _decrease(int quantity) {
+    final bloc = context.read<ShoppingCartBloc>();
+
     if (quantity > 1) {
-      setState(() {
-        quantity--;
-      });
+      bloc.add(DecrementProduct(widget.product));
     } else {
-      setState(() {
-        if (widget.active) {
+      if (widget.active) {
+        setState(() {
           isQuantitySelector = false;
-        }
-        quantity = 1;
-      });
+        });
+      }
+      final bloc = context.read<ShoppingCartBloc>();
+      final List<ShoppingCartItem> items = bloc.state.cartItems;
+
+      final ShoppingCartItem item = items.firstWhere(
+        (e) => e.product == widget.product,
+        orElse: () => ShoppingCartItem(product: widget.product, quantity: 1),
+      );
+      bloc.add(RemoveProduct(item));
     }
   }
 
@@ -82,22 +102,33 @@ class _CurvedButtonState extends State<CurvedButton> {
             borderRadius: BorderRadius.circular(20),
           ),
           child: isQuantitySelector
-              ? Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      _iconButton("-", _decrease),
-                      Text(
-                        '$quantity',
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
+              ? BlocBuilder<ShoppingCartBloc, ShoppingCartState>(
+                  builder: (context, state) {
+                    final item = state.cartItems.firstWhere(
+                      (e) => e.product == widget.product,
+                      orElse: () => ShoppingCartItem(
+                          product: widget.product, quantity: 1),
+                    );
+                    final int quantity = item.quantity;
+
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          _iconButton("-", () => _decrease(quantity)),
+                          Text(
+                            '$quantity',
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          _iconButton("+", _increase),
+                        ],
                       ),
-                      _iconButton("+", _increase),
-                    ],
-                  ),
+                    );
+                  },
                 )
               : Center(
                   child: Icon(widget.icon),
@@ -124,7 +155,7 @@ class _CurvedButtonState extends State<CurvedButton> {
           onPressed: onPressed,
           child: Text(
             text,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
               color: Colors.black,
@@ -168,7 +199,5 @@ class CustomClip extends CustomClipper<Path> {
   }
 
   @override
-  bool shouldReclip(covariant CustomClipper oldClipper) {
-    return true;
-  }
+  bool shouldReclip(covariant CustomClipper oldClipper) => true;
 }

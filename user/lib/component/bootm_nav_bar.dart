@@ -54,8 +54,8 @@ class BootmNavBar extends StatelessWidget {
                 text: 'Likes',
               ),
               GButton(
-                icon: Icons.local_shipping_outlined,
-                text: 'Shipping',
+                icon: Icons.person_2_outlined,
+                text: 'Profile',
               )
             ],
           ),

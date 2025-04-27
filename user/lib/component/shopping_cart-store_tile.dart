@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:user/blocs/shopping_cart_bloc.dart';
 import 'package:user/classes/shop_class.dart';
 import 'package:user/classes/shopping_cart_class.dart';
@@ -138,24 +139,39 @@ class _ShoppingCartStoreTileState extends State<ShoppingCartStoreTile>
                       final item = entry.value;
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 12),
-                        child: Container(
-                          child: ShoppingCartItemTile(
-                            cartItem: item,
-                            increment: () {
-                              context.read<ShoppingCartBloc>().add(
-                                    IncrementProduct(item.product),
-                                  );
-                            },
-                            decrement: () {
-                              context.read<ShoppingCartBloc>().add(
-                                    DecrementProduct(item.product),
-                                  );
-                            },
-                            onPressed: (p0) {
-                              context.read<ShoppingCartBloc>().add(
-                                    RemoveProduct(item),
-                                  );
-                            },
+                        child: Slidable(
+                          endActionPane: ActionPane(
+                            motion: StretchMotion(),
+                            children: [
+                              SlidableAction(
+                                onPressed: (context) =>
+                                    context.read<ShoppingCartBloc>().add(
+                                          RemoveProduct(item),
+                                        ),
+                                icon: Icons.delete,
+                                backgroundColor: Colors.red,
+                                borderRadius: BorderRadius.only(
+                                  topRight: Radius.circular(12.0),
+                                  bottomRight: Radius.circular(12.0),
+                                ),
+                              ),
+                            ],
+                          ),
+                          child: Container(
+                            child: ShoppingCartItemTile(
+                              cartItem: item,
+                              active: true,
+                              increment: () {
+                                context.read<ShoppingCartBloc>().add(
+                                      IncrementProduct(item.product),
+                                    );
+                              },
+                              decrement: () {
+                                context.read<ShoppingCartBloc>().add(
+                                      DecrementProduct(item.product),
+                                    );
+                              },
+                            ),
                           ),
                         ),
                       );
