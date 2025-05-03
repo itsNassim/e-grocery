@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/adapters.dart';
 import 'package:user/authuntication/log_in.dart';
+import 'package:user/backend/auth/auth.dart';
 
 import '../component/button.dart';
 import '../component/text_field.dart';
@@ -27,22 +29,43 @@ class _SingUpPageState extends State<SingUpPage> {
   void _loadImageWidth() {
     final image = Image.asset("assets/logo/logo.png");
 
-    image.image
-        .resolve(ImageConfiguration())
-        .addListener(
-          ImageStreamListener((ImageInfo info, bool sync) {
-            setState(() {
-              imageWidth = info.image.width.toDouble();
-              imageHieght = info.image.height.toDouble();
-            });
-          }),
-        );
+    image.image.resolve(ImageConfiguration()).addListener(
+      ImageStreamListener((ImageInfo info, bool sync) {
+        setState(() {
+          imageWidth = info.image.width.toDouble();
+          imageHieght = info.image.height.toDouble();
+        });
+      }),
+    );
   }
 
   @override
   void initState() {
     super.initState();
     _loadImageWidth();
+  }
+
+  void handleSubmit() async {
+    if (_formKey.currentState!.validate()) {
+      String email = emailController.text.trim();
+      String fullname = fullnameController.text.trim();
+      String phonenumber = phonenumberController.text.trim();
+      String password = passwordController.text.trim();
+
+      bool token = await signup(
+        email,
+        fullname,
+        phonenumber,
+        password,
+      );
+
+      if (token) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => LogInPage()),
+        );
+      }
+    }
   }
 
   @override
@@ -96,7 +119,7 @@ class _SingUpPageState extends State<SingUpPage> {
                       ),
                     ),
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 16.0),
+                      padding: const EdgeInsets.symmetric(vertical: 20.0),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -113,7 +136,7 @@ class _SingUpPageState extends State<SingUpPage> {
                                 ),
                                 textAlign: TextAlign.center,
                               ),
-                              SizedBox(height: 20),
+                              SizedBox(height: 40),
                               Form(
                                 key: _formKey,
                                 child: Padding(
@@ -155,8 +178,13 @@ class _SingUpPageState extends State<SingUpPage> {
                                         preIconColor: Color(0xFF6C1144),
                                         sufIcon: null,
                                         validator: (value) {
-                                          if (value!.isEmpty) {
-                                            return "You should fill the email";
+                                          if (value == null ||
+                                              value.trim().isEmpty) {
+                                            return "Please enter your email";
+                                          } else if (!RegExp(
+                                                  r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
+                                              .hasMatch(value)) {
+                                            return "Please enter a valid email";
                                           }
                                           return null;
                                         },
@@ -175,8 +203,12 @@ class _SingUpPageState extends State<SingUpPage> {
                                         preIconColor: Color(0xFF6C1144),
                                         sufIcon: null,
                                         validator: (value) {
-                                          if (value!.isEmpty) {
+                                          if (value == null ||
+                                              value.trim().isEmpty) {
                                             return "You should fill the phone number";
+                                          } else if (!RegExp(r'^\d{7,15}$')
+                                              .hasMatch(value.trim())) {
+                                            return "Please enter a valid phone number";
                                           }
                                           return null;
                                         },
@@ -195,10 +227,11 @@ class _SingUpPageState extends State<SingUpPage> {
                                         preIconColor: Color(0xFF6C1144),
                                         sufIcon: null,
                                         validator: (value) {
-                                          if (value == null || value.isEmpty) {
-                                            return "You should fill the password";
-                                          } else if (value.length <= 3) {
-                                            return "The entered password is too short";
+                                          if (value == null ||
+                                              value.trim().isEmpty) {
+                                            return "Please enter your password";
+                                          } else if (value.length < 6) {
+                                            return "Password is too short (min 6 characters)";
                                           }
                                           return null;
                                         },
@@ -208,7 +241,7 @@ class _SingUpPageState extends State<SingUpPage> {
                                         controller: confairmepasswordController,
                                         hidingPassword: true,
                                         textStyleColor: Color(0xFF6C1144),
-                                        labelText: "Confirme Password",
+                                        labelText: "Confirm Password",
                                         labelStyleColor: Color(0xFF6C1144),
                                         hintText: "rewrite your password",
                                         hintStyleColor: Color(0xFF6C1144),
@@ -216,22 +249,26 @@ class _SingUpPageState extends State<SingUpPage> {
                                         preIcon: Icons.password_outlined,
                                         preIconColor: Color(0xFF6C1144),
                                         validator: (value) {
-                                          if (value == null || value.isEmpty) {
-                                            return "You should fill the password";
-                                          } else if (value.length <= 3) {
-                                            return "The entered password is too short";
+                                          if (value == null ||
+                                              value.trim().isEmpty) {
+                                            return "Please confirm your password";
+                                          } else if (value !=
+                                              passwordController.text) {
+                                            return "The passwords do not match";
                                           }
                                           return null;
                                         },
                                       ),
-                                      const SizedBox(height: 30),
+                                      const SizedBox(height: 50),
                                       CustomButton(
                                         text: "Sing Up",
                                         height: 50,
                                         width: double.infinity,
                                         backgroundColor: Color(0xFF064C4F),
                                         fontColor: Colors.white,
-                                        onTap: () {},
+                                        onTap: () {
+                                          handleSubmit();
+                                        },
                                       ),
                                     ],
                                   ),
@@ -248,8 +285,7 @@ class _SingUpPageState extends State<SingUpPage> {
                               ),
                               InkWell(
                                 onTap: () {
-                                  Navigator.pop(context);
-                                  Navigator.push(
+                                  Navigator.pushReplacement(
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) => LogInPage(),

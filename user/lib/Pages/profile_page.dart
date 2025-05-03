@@ -1,10 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hive/hive.dart';
 import 'package:user/Backgrounds/backgound_1.dart';
 import 'package:user/Pages/cart_page.dart';
+import 'package:user/Pages/profile/about_us_page.dart';
 import 'package:user/Pages/profile/all_orders_page.dart';
+import 'package:user/Pages/profile/change_password_page.dart';
 import 'package:user/Pages/profile/coupons_page.dart';
+import 'package:user/Pages/profile/delete_account_page.dart';
+import 'package:user/Pages/profile/faq_page.dart';
+import 'package:user/Pages/profile/feedback_page.dart';
 import 'package:user/Pages/profile/payment_method_page.dart';
+import 'package:user/Pages/profile/personal_info_page.dart';
+import 'package:user/Pages/profile/privacy_page.dart';
+import 'package:user/authuntication/log_in.dart';
+import 'package:user/backend/auth/auth.dart';
+import 'package:user/backend/user/user.dart';
 import 'package:user/blocs/shopping_cart_bloc.dart';
 import 'package:user/classes/user_class.dart';
 import 'package:user/component/search_bar.dart';
@@ -19,11 +30,38 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   late User user;
+  var box = Hive.box("mybox");
+  bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    user = globalUsersList[0];
+    user = User(
+        ID: 0, fullName: "Unknown", email: "Unknown", phoneNumber: "Unknown");
+    loadUserInfo();
+  }
+
+  Future<void> loadUserInfo() async {
+    setState(() => isLoading = true);
+    final tokenMap = box.get("token");
+    final refreshToken = tokenMap?["refresh"];
+
+    final accessToken = await refreshAccessToken(refreshToken);
+    if (accessToken != null) {
+      final userInfo = await fetchUserInfo(accessToken);
+      if (userInfo != null) {
+        setState(() {
+          user = User.fromJson(userInfo);
+          isLoading = false;
+        });
+      } else {
+        print('Failed to fetch user info');
+        setState(() => isLoading = false);
+      }
+    } else {
+      print('Refresh token invalid or expired');
+      setState(() => isLoading = false);
+    }
   }
 
   @override
@@ -32,6 +70,8 @@ class _ProfilePageState extends State<ProfilePage> {
     final width = MediaQuery.of(context).size.width;
     final toppadding = MediaQuery.of(context).padding.top;
     final bottompadding = MediaQuery.of(context).padding.bottom;
+    var box = Hive.box("mybox");
+
     return Scaffold(
       backgroundColor: Colors.grey[200],
       body: SafeArea(
@@ -206,29 +246,131 @@ class _ProfilePageState extends State<ProfilePage> {
                       child: Column(
                         children: [
                           _buildProfileRow(
-                              Icons.person_2_outlined, "My Personal Info"),
+                            Icons.person_2_outlined,
+                            "My Personal Info",
+                            () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => PersonalInfoPage(
+                                      user: user,
+                                    ),
+                                  )).then((value) => setState(() {
+                                    loadUserInfo();
+                                  }));
+                            },
+                          ),
                           Divider(
                               color: Colors.grey[300],
-                              thickness: 1,
+                              thickness: 2,
                               height: 30),
-                          _buildProfileRow(Icons.info_outline, "About us"),
+                          _buildProfileRow(
+                            Icons.lock_outline,
+                            "Change Password",
+                            () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          ChangePasswordPage()));
+                            },
+                          ),
                           Divider(
                               color: Colors.grey[300],
-                              thickness: 1,
+                              thickness: 2,
                               height: 30),
-                          _buildProfileRow(Icons.feedback_outlined, "Feedback"),
+                          _buildProfileRow(
+                            Icons.delete_outline,
+                            "Delete Account",
+                            () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => DeleteAccountPage(),
+                                  ));
+                            },
+                          ),
                           Divider(
                               color: Colors.grey[300],
-                              thickness: 1,
+                              thickness: 2,
                               height: 30),
-                          _buildProfileRow(Icons.settings, "Settings"),
+                          _buildProfileRow(
+                            Icons.info_outline,
+                            "About us",
+                            () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => AboutUsPage(),
+                                  ));
+                            },
+                          ),
                           Divider(
                               color: Colors.grey[300],
-                              thickness: 1,
+                              thickness: 2,
                               height: 30),
-                          _buildProfileRow(Icons.logout, "Logout"),
+                          _buildProfileRow(
+                            Icons.policy_outlined,
+                            "Privacy Policy",
+                            () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => PrivacyPage(),
+                                  ));
+                            },
+                          ),
+                          Divider(
+                              color: Colors.grey[300],
+                              thickness: 2,
+                              height: 30),
+                          _buildProfileRow(
+                            Icons.help_outline,
+                            "FAQ",
+                            () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => FaqPage(),
+                                  ));
+                            },
+                          ),
+                          Divider(
+                              color: Colors.grey[300],
+                              thickness: 2,
+                              height: 30),
+                          _buildProfileRow(
+                            Icons.feedback_outlined,
+                            "Feedback",
+                            () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => FeedbackPage(),
+                                  ));
+                            },
+                          ),
+                          Divider(
+                              color: Colors.grey[300],
+                              thickness: 2,
+                              height: 30),
+                          _buildProfileRow(
+                            Icons.logout,
+                            "Logout",
+                            () {
+                              box.delete("token");
+                              Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => LogInPage(),
+                                  ));
+                            },
+                          ),
                         ],
                       ),
+                    ),
+                    SizedBox(
+                      height: 120,
                     ),
                   ],
                 ),
@@ -271,26 +413,35 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _buildProfileRow(IconData icon, String title) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Row(
+  Widget _buildProfileRow(IconData icon, String title, void Function()? onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.all(3),
+        decoration: BoxDecoration(
+          color: Colors.white,
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Icon(icon, size: 30, color: Colors.black54),
-            const SizedBox(width: 12),
-            Text(
-              title,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w700,
-                color: Colors.black54,
-              ),
+            Row(
+              children: [
+                Icon(icon, size: 30, color: Colors.black54),
+                const SizedBox(width: 12),
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.black54,
+                  ),
+                ),
+              ],
             ),
+            const Icon(Icons.arrow_forward_ios_rounded, color: Colors.black54),
           ],
         ),
-        const Icon(Icons.arrow_forward_ios_rounded, color: Colors.black54),
-      ],
+      ),
     );
   }
 }

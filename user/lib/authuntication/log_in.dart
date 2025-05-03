@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:user/Pages/main_page.dart';
 import 'package:user/authuntication/sing_up.dart';
-
+import 'package:user/backend/auth/auth.dart';
 
 import '../component/button.dart';
 import '../component/text_field.dart';
@@ -19,7 +21,7 @@ class _LogInPageState extends State<LogInPage> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
-  bool hidingPassword = false;
+  bool hidingPassword = true;
   bool showError = false;
 
   double? imageWidth;
@@ -44,34 +46,30 @@ class _LogInPageState extends State<LogInPage> {
     _loadImageWidth();
   }
 
-  void handleSubmit() {
+  void handleSubmit() async {
     if (_formKey.currentState!.validate()) {
-      setState(() {
-        showError = false;
-      });
-      String email = emailController.text;
-      String password = passwordController.text;
-      print("Email: $email");
-      print("Password: $password");
+      String email = emailController.text.trim();
+      String password = passwordController.text.trim();
 
-      showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            icon: Icon(Icons.check_circle, color: Colors.green, size: 40),
-            title: Text("Login Successful"),
-            content: Text("Email: $email\nPassword: $password"),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: Text("OK"),
-              )
-            ],
-          );
-        },
-      );
+      final token = await login(email, password);
+
+      if (token != null) {
+        setState(() {
+          showError = false;
+        });
+
+        var box = Hive.box("mybox");
+        box.put("token", token);
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => MainPage()),
+        );
+      } else {
+        setState(() {
+          showError = true;
+        });
+      }
     }
   }
 
@@ -174,14 +172,13 @@ class _LogInPageState extends State<LogInPage> {
                                         preIconColor: Color(0xFF6C1144),
                                         sufIcon: null,
                                         validator: (value) {
-                                          if (value!.isEmpty) {
-                                            return "You should fill the email";
-                                          } else if (value !=
-                                              "John@gmail.com") {
-                                            setState(() {
-                                              showError = true;
-                                            });
-                                            return "";
+                                          if (value == null ||
+                                              value.trim().isEmpty) {
+                                            return "Please enter your email";
+                                          } else if (!RegExp(
+                                                  r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
+                                              .hasMatch(value)) {
+                                            return "Please enter a valid email";
                                           }
                                           return null;
                                         },
@@ -206,15 +203,11 @@ class _LogInPageState extends State<LogInPage> {
                                           });
                                         },
                                         validator: (value) {
-                                          if (value == null || value.isEmpty) {
-                                            return "You should fill the password";
-                                          } else if (value.length <= 3) {
-                                            return "The entered password is too short";
-                                          } else if (value != "JohnJohn") {
-                                            setState(() {
-                                              showError = true;
-                                            });
-                                            return " ";
+                                          if (value == null ||
+                                              value.trim().isEmpty) {
+                                            return "Please enter your password";
+                                          } else if (value.length < 6) {
+                                            return "Password is too short (min 6 characters)";
                                           }
                                           return null;
                                         },
@@ -259,8 +252,7 @@ class _LogInPageState extends State<LogInPage> {
                               ),
                               InkWell(
                                 onTap: () {
-                                  Navigator.pop(context);
-                                  Navigator.push(
+                                  Navigator.pushReplacement(
                                       context,
                                       MaterialPageRoute(
                                         builder: (context) => SingUpPage(),

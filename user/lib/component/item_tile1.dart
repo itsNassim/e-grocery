@@ -4,16 +4,14 @@ import 'package:user/component/curved_button.dart';
 
 class ItemTile1 extends StatefulWidget {
   final Product product;
-  final bool active;
+  final Widget curvedButton;
   final void Function()? onTap;
-  final Function()? onTapCurvedButton;
 
   const ItemTile1({
     super.key,
     required this.product,
-    required this.active,
+    required this.curvedButton,
     required this.onTap,
-    required this.onTapCurvedButton,
   });
 
   @override
@@ -47,7 +45,7 @@ class _ItemTile1State extends State<ItemTile1> {
                 Column(
                   children: [
                     ClipRRect(
-                      child: Image.asset(
+                      child: Image.network(
                         widget.product.imageName,
                         height: 100,
                         width: 100,
@@ -109,20 +107,11 @@ class _ItemTile1State extends State<ItemTile1> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8.0),
                   child: GestureDetector(
-                    onTap: widget.onTapCurvedButton,
                     behavior: HitTestBehavior.translucent,
                     child: SizedBox(
                       height: 60,
                       width: double.infinity,
-                      child: CurvedButton(
-                        height: 60,
-                        width: 150,
-                        icon: Icons.add,
-                        color: const Color.fromARGB(255, 226, 239, 218),
-                        active: widget.active,
-                        onTap: widget.onTapCurvedButton,
-                        product: widget.product,
-                      ),
+                      child: widget.curvedButton,
                     ),
                   ),
                 ),

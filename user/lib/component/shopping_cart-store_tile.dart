@@ -76,7 +76,7 @@ class _ShoppingCartStoreTileState extends State<ShoppingCartStoreTile>
                   children: [
                     ClipRRect(
                       borderRadius: BorderRadius.circular(35),
-                      child: Image.asset(
+                      child: Image.network(
                         widget.shop.imageUrl,
                         height: 60,
                         width: 60,
@@ -196,7 +196,7 @@ class _ShoppingCartStoreTileState extends State<ShoppingCartStoreTile>
                           shape: BoxShape.circle,
                         ),
                         clipBehavior: Clip.hardEdge,
-                        child: Image.asset(
+                        child: Image.network(
                           item.product.imageName,
                           fit: BoxFit.contain,
                         ),

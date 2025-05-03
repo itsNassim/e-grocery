@@ -2,9 +2,9 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:user/backend/base.dart';
 
-
 //SINGUP
-Future<bool> signup(String email, String fullName, String phoneNumber, String password) async {
+Future<bool> signup(
+    String email, String fullName, String phoneNumber, String password) async {
   final response = await http.post(
     Uri.parse('$baseUrl/signup/'),
     headers: {'Content-Type': 'application/json'},
@@ -24,41 +24,42 @@ Future<bool> signup(String email, String fullName, String phoneNumber, String pa
   }
 }
 
-
 //LOGIN
-Future<String?> login(String email, String password) async {
+Future<Map<String, dynamic>?> login(String email, String password) async {
+  final url = Uri.parse('$baseUrl/login/');
+  final headers = {'Content-Type': 'application/json'};
+  final body = jsonEncode({'email': email, 'password': password});
+
+  try {
+    final response = await http.post(url, headers: headers, body: body);
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      print('Login failed: ${response.body}');
+      return null;
+    }
+  } catch (e) {
+    print('Error during login: $e');
+    return null;
+  }
+}
+
+//TOKEN
+Future<String?> refreshAccessToken(String refreshToken) async {
   final response = await http.post(
-    Uri.parse('$baseUrl/login/'),
+    Uri.parse('$baseUrl/refresh/'),
     headers: {'Content-Type': 'application/json'},
-    body: jsonEncode({
-      'email': email,
-      'password': password,
-    }),
+    body: jsonEncode({'refresh': refreshToken}),
   );
 
   if (response.statusCode == 200) {
     final data = jsonDecode(response.body);
-    final token = data['access'];
-    return token;
+    return data['access'];
   } else {
-    print('Login failed: ${response.body}');
+    print('Failed to refresh token: ${response.body}');
     return null;
   }
 }
 
 
-//TOKEN
-Future<void> getProfile(String token) async {
-  final response = await http.get(
-    Uri.parse('$baseUrl/profile/'),
-    headers: {
-      'Authorization': 'Bearer $token',
-    },
-  );
-
-  if (response.statusCode == 200) {
-    print('User data: ${response.body}');
-  } else {
-    print('Failed to get profile: ${response.body}');
-  }
-}

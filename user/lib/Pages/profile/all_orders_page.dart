@@ -23,7 +23,7 @@ class _AllOrdersPageState extends State<AllOrdersPage> {
           height: height - toppadding - bottompadding,
           child: Stack(
             children: [
-              Padding(
+              /*Padding(
                 padding: EdgeInsets.only(top: height * 0.15),
                 child: ListView.builder(
                   itemCount: globalOrdersList.length,
@@ -44,14 +44,14 @@ class _AllOrdersPageState extends State<AllOrdersPage> {
                           if (order.Status != "picked up" &&
                               order.Status != "delivery" &&
                               order.Status != "cancelled") {
-                            globalOrdersList[index].Status = "cancelled";
+                           // globalOrdersList[index].Status = "cancelled";
                           }
                         });
                       },
                     );
                   },
                 ),
-              ),
+              ),*/
               SizedBox(
                 height: height * 0.15,
                 child: Stack(

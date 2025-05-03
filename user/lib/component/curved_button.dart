@@ -9,7 +9,7 @@ class CurvedButton extends StatefulWidget {
   final double width;
   final IconData icon;
   final Color color;
-  final bool active;
+
   final void Function()? onTap;
   final Product product;
 
@@ -19,7 +19,6 @@ class CurvedButton extends StatefulWidget {
     required this.width,
     required this.icon,
     required this.color,
-    required this.active,
     required this.product,
     this.onTap,
   });
@@ -29,13 +28,11 @@ class CurvedButton extends StatefulWidget {
 }
 
 class _CurvedButtonState extends State<CurvedButton> {
-  late bool isQuantitySelector;
+  bool isQuantitySelector = false;
 
   @override
   void initState() {
     super.initState();
-
-    isQuantitySelector = !widget.active;
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final cartItems = context.read<ShoppingCartBloc>().state.cartItems;
@@ -70,11 +67,6 @@ class _CurvedButtonState extends State<CurvedButton> {
     if (quantity > 1) {
       bloc.add(DecrementProduct(widget.product));
     } else {
-      if (widget.active) {
-        setState(() {
-          isQuantitySelector = false;
-        });
-      }
       final bloc = context.read<ShoppingCartBloc>();
       final List<ShoppingCartItem> items = bloc.state.cartItems;
 
@@ -91,7 +83,7 @@ class _CurvedButtonState extends State<CurvedButton> {
     final Color activeColor = const Color(0xFF7D9A4F);
 
     return GestureDetector(
-      onTap: widget.active ? _toggleToQuantitySelector : null,
+      onTap: _toggleToQuantitySelector,
       child: ClipPath(
         clipper: CustomClip(),
         child: Container(

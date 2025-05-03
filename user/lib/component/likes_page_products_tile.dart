@@ -5,7 +5,7 @@ import 'package:user/classes/products_class.dart';
 
 class ProductsTile extends StatefulWidget {
   final Likeslist item;
-  double width;
+  final double width;
   final void Function(BuildContext)? onPressed;
 
   ProductsTile({
@@ -86,7 +86,7 @@ class eProductsTileState extends State<ProductsTile> {
                       ),
                       child: Center(
                         child: widget.item.productsList.length > 0
-                            ? Image.asset(
+                            ? Image.network(
                                 widget.item.productsList[0].imageName,
                                 height: 200,
                                 width: widget.width * 0.28,
@@ -107,7 +107,7 @@ class eProductsTileState extends State<ProductsTile> {
                       ),
                       child: Center(
                         child: widget.item.productsList.length > 1
-                            ? Image.asset(
+                            ? Image.network(
                                 widget.item.productsList[1].imageName,
                                 height: 200,
                                 width: widget.width * 0.28,
@@ -130,7 +130,7 @@ class eProductsTileState extends State<ProductsTile> {
                           ),
                           child: Center(
                             child: widget.item.productsList.length > 2
-                                ? Image.asset(
+                                ? Image.network(
                                     widget.item.productsList[2].imageName,
                                     height: 200,
                                     width: widget.width * 0.28,
@@ -151,7 +151,7 @@ class eProductsTileState extends State<ProductsTile> {
                           ),
                           child: Center(
                             child: widget.item.productsList.length > 3
-                                ? Image.asset(
+                                ? Image.network(
                                     widget.item.productsList[3].imageName,
                                     height: 200,
                                     width: widget.width * 0.28,

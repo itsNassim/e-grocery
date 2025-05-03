@@ -43,7 +43,7 @@ class _ShoppingCartItemTileState extends State<ShoppingCartItemTile> {
         children: [
           ClipRRect(
             borderRadius: BorderRadius.circular(16),
-            child: Image.asset(
+            child: Image.network(
               widget.cartItem.product.imageName,
               height: 100,
               width: 100,

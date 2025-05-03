@@ -10,6 +10,15 @@ class User {
     required this.email,
     required this.phoneNumber,
   });
+
+  factory User.fromJson(Map<String, dynamic> json) {
+    return User(
+      ID: json["id"],
+      fullName: json["full_name"],
+      email: json["email"],
+      phoneNumber: json["phone_number"],
+    );
+  }
 }
 
 List<User> globalUsersList = [

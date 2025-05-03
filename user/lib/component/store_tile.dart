@@ -3,11 +3,14 @@ import 'package:user/classes/shop_class.dart';
 
 class StoreTile extends StatelessWidget {
   final ShopClass store;
-  final String time;
-  StoreTile({
+  final Widget widget;
+  final double rating;
+
+  const StoreTile({
     super.key,
     required this.store,
-    required this.time,
+    required this.widget,
+    required this.rating,
   });
 
   @override
@@ -17,16 +20,17 @@ class StoreTile extends StatelessWidget {
       width: 300,
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(15),
       ),
       child: Stack(
         children: [
+          // Store Image
           Positioned(
             top: 0,
             left: 0,
             right: 0,
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(15),
               child: Image.asset(
                 "assets/background/striped-awning.jpg",
                 height: 125,
@@ -35,6 +39,7 @@ class StoreTile extends StatelessWidget {
               ),
             ),
           ),
+          // Dark overlay
           Positioned(
             top: 0,
             left: 0,
@@ -45,6 +50,7 @@ class StoreTile extends StatelessWidget {
               color: Colors.grey.withOpacity(0.15),
             ),
           ),
+          // Store Logo
           Positioned(
             top: 100,
             left: 50,
@@ -59,7 +65,7 @@ class StoreTile extends StatelessWidget {
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(20),
-                child: Image.asset(
+                child: Image.network(
                   store.imageUrl,
                   height: 50,
                   width: 50,
@@ -68,8 +74,11 @@ class StoreTile extends StatelessWidget {
               ),
             ),
           ),
+
           Positioned(
             top: 170,
+            left: 0,
+            right: 0,
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
               child: Column(
@@ -77,28 +86,48 @@ class StoreTile extends StatelessWidget {
                 children: [
                   Text(
                     store.name,
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                  SizedBox(
-                    height: 8,
-                  ),
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.flash_on,
-                        color: Colors.amber,
-                      ),
-                      Text(
-                        "In " + time,
-                        style: TextStyle(
-                            color: Colors.grey, fontWeight: FontWeight.w700),
-                      )
-                    ],
+                  const SizedBox(height: 8),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            for (int i = 1; i <= 5; i++)
+                              Icon(
+                                i <= rating
+                                    ? Icons.star
+                                    : (i - rating <= 0.5
+                                        ? Icons.star_half
+                                        : Icons.star_border),
+                                color: Colors.orange,
+                                size: 18,
+                              ),
+                            const SizedBox(width: 4),
+                            Text(
+                              rating.toStringAsFixed(1),
+                              style: const TextStyle(
+                                fontSize: 14,
+                                color: Colors.orange,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                        widget,
+                      ],
+                    ),
                   ),
                 ],
               ),
             ),
-          )
+          ),
         ],
       ),
     );

@@ -1,31 +1,21 @@
 import 'package:user/classes/user_class.dart';
 
-class ReviewClass {
+class Review {
   final User user;
   final String text;
-  final int stars;
+  final int rating;
 
-  ReviewClass({
-    required this.user,
+  Review({
     required this.text,
-    required this.stars,
+    required this.rating,
+    required this.user,
   });
-}
 
-List<ReviewClass> golbelReviewList = [
-  ReviewClass(
-    user: globalUsersList[0],
-    text: "Great quality products!",
-    stars: 5,
-  ),
-  ReviewClass(
-    user: globalUsersList[1],
-    text: "Good prices and fast delivery.",
-    stars: 4,
-  ),
-  ReviewClass(
-    user: globalUsersList[2],
-    text: "Customer support was helpful.",
-    stars: 2,
-  ),
-];
+  factory Review.fromJson(Map<String, dynamic> json) {
+    return Review(
+      user: User.fromJson(json['user']),
+      text: json['text'],
+      rating: json['rating'],
+    );
+  }
+}

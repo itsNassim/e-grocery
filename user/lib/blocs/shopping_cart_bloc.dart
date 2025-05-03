@@ -1,5 +1,6 @@
 // shopping_cart_bloc.dart
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:user/backend/shopping_cart/shopping_cart.dart';
 import 'package:user/classes/products_class.dart';
 import 'package:user/classes/shopping_cart_class.dart';
 
@@ -30,49 +31,77 @@ class DecrementProduct extends ShoppingCartEvent {
   DecrementProduct(this.product);
 }
 
-class RefreshCart extends ShoppingCartEvent {} // 👈 Optional for manual refresh
+class ClearCartEvent extends ShoppingCartEvent {}
+
+class RefreshCart extends ShoppingCartEvent {}
 
 class ShoppingCartBloc extends Bloc<ShoppingCartEvent, ShoppingCartState> {
-  ShoppingCartBloc() : super(ShoppingCartState([])) {
-    on<AddProduct>((event, emit) {
-      final updated = List<ShoppingCartItem>.from(state.cartItems)
-        ..add(event.cartItem);
-      emit(ShoppingCartState(updated));
+  final CartApiService apiService;
+
+  ShoppingCartBloc(this.apiService) : super(ShoppingCartState([])) {
+    on<AddProduct>((event, emit) async {
+      try {
+        await apiService.addToCart(
+            event.cartItem.product.id, event.cartItem.quantity);
+        add(RefreshCart());
+      } catch (e) {
+        print("Error adding product: $e");
+      }
     });
 
-    on<RemoveProduct>((event, emit) {
-      final updated = List<ShoppingCartItem>.from(state.cartItems)
-        ..remove(event.cartItem);
-      emit(ShoppingCartState(updated));
+    on<RemoveProduct>((event, emit) async {
+      try {
+        await apiService.removeFromCart(event.cartItem.product.id);
+        add(RefreshCart());
+      } catch (e) {
+        print("Error removing product: $e");
+      }
     });
 
-    on<IncrementProduct>((event, emit) {
-      final updated = state.cartItems.map((item) {
-        if (item.product == event.product) {
-          return ShoppingCartItem(
-              product: item.product, quantity: item.quantity + 1);
+    on<IncrementProduct>((event, emit) async {
+      try {
+        final item =
+            state.cartItems.firstWhere((i) => i.product.id == event.product.id);
+        await apiService.updateQuantity(event.product.id, item.quantity + 1);
+        add(RefreshCart());
+      } catch (e) {
+        print("Error incrementing product: $e");
+      }
+    });
+
+    on<DecrementProduct>((event, emit) async {
+      try {
+        final item =
+            state.cartItems.firstWhere((i) => i.product.id == event.product.id);
+        if (item.quantity > 1) {
+          await apiService.updateQuantity(event.product.id, item.quantity - 1);
+          add(RefreshCart());
+        } else {
+          await apiService.removeFromCart(event.product.id);
+          add(RefreshCart());
         }
-        return item;
-      }).toList();
-      emit(ShoppingCartState(updated));
+      } catch (e) {
+        print("Error decrementing product: $e");
+      }
     });
 
-    on<DecrementProduct>((event, emit) {
-      final updated = state.cartItems
-          .map((item) {
-            if (item.product == event.product && item.quantity > 1) {
-              return ShoppingCartItem(
-                  product: item.product, quantity: item.quantity - 1);
-            }
-            return item;
-          })
-          .where((item) => item.quantity > 0)
-          .toList();
-      emit(ShoppingCartState(updated));
+    on<ClearCartEvent>((event, emit) async {
+      try {
+        await apiService.clearCart();
+        emit(ShoppingCartState([]));
+      } catch (e) {
+        print("Error clearing cart: $e");
+      }
     });
 
-    on<RefreshCart>((event, emit) {
-      emit(ShoppingCartState(state.cartItems)); // re-emit same state
+    on<RefreshCart>((event, emit) async {
+      try {
+        final items = await apiService.fetchCart();
+        emit(ShoppingCartState(items));
+      } catch (e, stackTrace) {
+        print("Error loading cart: $e");
+        print("Stack trace:\n$stackTrace");
+      }
     });
   }
 }

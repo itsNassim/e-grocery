@@ -1,11 +1,13 @@
-import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:user/blocs/liked_list_block.dart';
 import 'package:user/classes/likesList_class.dart';
+import 'package:user/classes/products_class.dart';
 import 'package:user/component/liked_page_containe.dart';
 import 'package:user/component/likes_page_products_tile.dart';
 import 'package:user/component/likes_page_products_tile2.dart';
 
-class LikedPageContaine2 extends StatefulWidget {
+class LikedPageContaine2 extends StatelessWidget {
   final double height;
   final double width;
   final void Function(String name)? onCreate;
@@ -19,11 +21,6 @@ class LikedPageContaine2 extends StatefulWidget {
     this.onAdd,
   });
 
-  @override
-  State<LikedPageContaine2> createState() => _LikedPageContaineState();
-}
-
-class _LikedPageContaineState extends State<LikedPageContaine2> {
   void _showFullScreenBottomSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
@@ -34,27 +31,10 @@ class _LikedPageContaineState extends State<LikedPageContaine2> {
           height: MediaQuery.of(context).size.height,
           width: MediaQuery.of(context).size.width,
           suggestion: ["Meat", "Mouth watering", "Dinner"],
-          onCreate: widget.onCreate,
+          onCreate: onCreate,
         );
       },
     );
-  }
-
-  List<ProductsTile> get productTiles {
-    final width = MediaQuery.of(context).size.width;
-    return golobalLikesList.map((list) {
-      return ProductsTile(
-        width: width,
-        item: list,
-        onPressed: (p0) {},
-      );
-    }).toList();
-  }
-
-  @override
-  void dispose() {
-    print("Widget is being popped (disposed)");
-    super.dispose();
   }
 
   @override
@@ -64,7 +44,7 @@ class _LikedPageContaineState extends State<LikedPageContaine2> {
     return ClipPath(
       clipper: CustomTopClipper(),
       child: Container(
-        height: widget.height * 0.5 + (keyboardHeight > 0 ? keyboardHeight : 0),
+        height: height * 0.5 + (keyboardHeight > 0 ? keyboardHeight : 0),
         color: Colors.white,
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -117,28 +97,41 @@ class _LikedPageContaineState extends State<LikedPageContaine2> {
               SizedBox(
                 height: 15,
               ),
-              SizedBox(
-                height: widget.height * 0.35 +
-                    (keyboardHeight > 0 ? keyboardHeight : 0),
-                child: ListView.builder(
-                  itemCount: productTiles.length,
-                  itemBuilder: (context, index) {
-                    return GestureDetector(
-                      onTap: () {
-                        widget.onAdd?.call(index);
-                        Navigator.pop(context, true);
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8.0),
-                        child: ProductsTile2(
-                          item: productTiles[index].item,
-                          width: widget.width,
-                        ),
-                      ),
+              BlocBuilder<LikeslistBloc, LikeslistState>(
+                builder: (context, state) {
+                  List<ProductsTile> productTiles =
+                      state.likeslists.map((likeslist) {
+                    return ProductsTile(
+                      width: width,
+                      item: likeslist,
+                      onPressed: (p0) {},
                     );
-                  },
-                ),
-              )
+                  }).toList();
+
+                  return SizedBox(
+                    height: height * 0.35 +
+                        (keyboardHeight > 0 ? keyboardHeight : 0),
+                    child: ListView.builder(
+                      itemCount: productTiles.length,
+                      itemBuilder: (context, index) {
+                        return GestureDetector(
+                          onTap: () {
+                            onAdd?.call(index);
+                            Navigator.pop(context, true);
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 8.0),
+                            child: ProductsTile2(
+                              item: productTiles[index].item,
+                              width: width,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  );
+                },
+              ),
             ],
           ),
         ),

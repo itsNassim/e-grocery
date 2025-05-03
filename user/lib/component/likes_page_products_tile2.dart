@@ -42,7 +42,7 @@ class eProductsTileState extends State<ProductsTile2> {
                 ),
                 child: Center(
                   child: widget.item.productsList.length > 0
-                      ? Image.asset(
+                      ? Image.network(
                           widget.item.productsList[0].imageName,
                           height: 200,
                           width: widget.width * 0.28,

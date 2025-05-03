@@ -4,9 +4,11 @@ import 'package:user/Backgrounds/background_2.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:user/blocs/shopping_cart_bloc.dart';
+import 'package:user/classes/order_class.dart';
 
 import 'package:user/classes/shop_class.dart';
 import 'package:user/classes/shopping_cart_class.dart';
+import 'package:user/component/shop_cart/payment.dart';
 
 import 'package:user/component/shopping_cart-store_tile.dart';
 
@@ -20,8 +22,37 @@ class CartPage extends StatefulWidget {
 class _CartPageState extends State<CartPage> {
   late ScrollController _scrollController;
   bool _hasPopped = false;
-  bool emptyCart = false;
+  bool emptyCart = true;
   double total = 0;
+
+  void _showFullScreenBottomSheet(BuildContext context) {
+    showModalBottomSheet<bool>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (context) {
+        return PaymentPage(
+          total: total,
+          function: (selectedMethod) {
+            final cartItems = context.read<ShoppingCartBloc>().state.cartItems;
+
+            setState(() {
+             /* globalOrdersList.add(OrderClass(
+                ID: globalOrdersList.length + 1,
+                Status: "confirmed",
+                date: DateTime.now().toString().split(' ')[0],
+                paymentMethod: selectedMethod,
+                total: total,
+                items: cartItems,
+              ));*/
+            });
+
+            context.read<ShoppingCartBloc>().add(ClearCartEvent());
+          },
+        );
+      },
+    );
+  }
 
   Widget _buildTotalRow(String label, double value, {bool isBold = false}) {
     return Row(
@@ -106,6 +137,7 @@ class _CartPageState extends State<CartPage> {
                             WidgetsBinding.instance.addPostFrameCallback((_) {
                               setState(() {
                                 total = 0;
+                                emptyCart = true;
                               });
                             });
                             return SizedBox(
@@ -145,7 +177,7 @@ class _CartPageState extends State<CartPage> {
                           // Delay the setState to prevent build phase conflict
                           WidgetsBinding.instance.addPostFrameCallback((_) {
                             setState(() {
-                              emptyCart = true;
+                              emptyCart = false;
                             });
                           });
 
@@ -281,9 +313,9 @@ class _CartPageState extends State<CartPage> {
               ),
 
               // Footer
-              if (emptyCart)
+              if (!emptyCart)
                 Positioned(
-                  bottom: 5,
+                  bottom: 8,
                   left: 0,
                   right: 0,
                   child: Container(
@@ -293,7 +325,9 @@ class _CartPageState extends State<CartPage> {
                     child: BlocBuilder<ShoppingCartBloc, ShoppingCartState>(
                       builder: (context, state) {
                         return ElevatedButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            _showFullScreenBottomSheet(context);
+                          },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xffBBEA70),
                             shape: RoundedRectangleBorder(

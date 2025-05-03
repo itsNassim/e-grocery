@@ -9,12 +9,11 @@ class SecondBackGround extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return Container(
       child: ClipPath(
         clipper: CustomBottomClipper(),
         child: Container(
-          color: theme.primaryColor,
+          color: Color(0xFF013033),
           height: ScreenHeight * 0.15,
         ),
       ),

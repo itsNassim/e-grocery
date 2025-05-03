@@ -5,6 +5,15 @@ class Category {
     required this.imageName,
     required this.name,
   });
+
+  factory Category.fromJson(Map<String, dynamic> json) {
+    return Category(
+      imageName: json['image'], 
+      name: json['name'],
+    );
+  }
+
+  
 }
 
 List<Category> GolbelCategoryList = [

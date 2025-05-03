@@ -1,28 +1,61 @@
 import 'package:user/classes/user_class.dart';
 
 class ShopClass {
+  final int id;
   final String imageUrl;
   final String name;
-  final User owner;
+  final User? owner;
   final String email;
   final String phone;
   final String address;
-  final String opening_time;
-  final String closing_time;
+  final String openingTime;
+  final String closingTime;
 
   ShopClass({
+    required this.id,
     required this.imageUrl,
     required this.name,
-    required this.owner,
+    this.owner,
     required this.email,
     required this.phone,
     required this.address,
-    required this.opening_time,
-    required this.closing_time,
+    required this.openingTime,
+    required this.closingTime,
   });
+
+  factory ShopClass.fromJson(Map<String, dynamic> json) {
+    return ShopClass(
+      id: json['id'],
+      name: json['name'],
+      email: json['email'],
+      phone: json['phone'],
+      address: json['address'],
+      openingTime: json['opening_time'],
+      closingTime: json['closing_time'],
+      imageUrl: json['image'], // Default to an empty string if null
+      /*owner: json['owner'] != null
+          ? User.fromJson(json['owner'])
+          : null, */ // Assuming 'owner' is a nested User object
+    );
+  }
+
+  // Optionally, you can define a method to convert the class into a JSON map for API requests
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'email': email,
+      'phone': phone,
+      'address': address,
+      'opening_time': openingTime,
+      'closing_time': closingTime,
+      'image': imageUrl,
+      //'owner': owner?.toJson(), // Convert owner to JSON if it's not null
+    };
+  }
 }
 
-List<ShopClass> globalShopsList = [
+/*List<ShopClass> globalShopsList = [
   ShopClass(
     imageUrl: 'assets/logo/FreshMart_Grocery.png',
     name: 'FreshMart Grocery',
@@ -54,3 +87,4 @@ List<ShopClass> globalShopsList = [
     closing_time: '20:30',
   ),
 ];
+*/

@@ -45,7 +45,7 @@ class CategoryTile extends StatelessWidget {
               alignment: Alignment.bottomRight,
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(12),
-                child: Image.asset(
+                child: Image.network(
                   category.imageName,
                   height: 90,
                   width: 100,

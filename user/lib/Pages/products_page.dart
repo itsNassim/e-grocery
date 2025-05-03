@@ -3,15 +3,19 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:user/Backgrounds/backgound_1.dart';
 import 'package:user/Pages/cart_page.dart';
 import 'package:user/Pages/detail-page.dart';
+import 'package:user/blocs/liked_list_block.dart';
 import 'package:user/blocs/shopping_cart_bloc.dart';
 import 'package:user/classes/category_class.dart';
 import 'package:user/classes/products_class.dart';
 import 'package:user/classes/shopping_cart_class.dart';
 import 'package:user/component/FlyingItemAnimation.dart';
+import 'package:user/component/curved_button.dart';
+import 'package:user/component/filter_widget.dart';
 import 'package:user/component/item_tile1.dart';
 import 'package:user/component/search_bar.dart';
 import 'package:user/component/shopping_cart_icon.dart';
 
+// ignore: must_be_immutable
 class ProductsPage extends StatefulWidget {
   late int selectedCategoryIndex;
   ProductsPage({
@@ -93,10 +97,19 @@ class _ProductsPageState extends State<ProductsPage> {
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
 
-    return BlocListener<ShoppingCartBloc, ShoppingCartState>(
-      listener: (context, state) {
-        setState(() {});
-      },
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<ShoppingCartBloc, ShoppingCartState>(
+          listener: (context, state) {
+            setState(() {});
+          },
+        ),
+        BlocListener<LikeslistBloc, LikeslistState>(
+          listener: (context, state) {
+            setState(() {});
+          },
+        ),
+      ],
       child: Scaffold(
         backgroundColor: Colors.grey[100],
         body: SafeArea(
@@ -138,6 +151,9 @@ class _ProductsPageState extends State<ProductsPage> {
                                 child: Center(
                                   child: IconButton(
                                     onPressed: () {
+                                      context
+                                          .read<LikeslistBloc>()
+                                          .add(RefreshLikesLists());
                                       Navigator.pop(context);
                                     },
                                     icon: const Icon(
@@ -247,6 +263,12 @@ class _ProductsPageState extends State<ProductsPage> {
                       CustomSearchBar(width: width),
                       const SizedBox(width: 12),
                       GestureDetector(
+                        onTap: () => showModalBottomSheet(
+                          context: context,
+                          backgroundColor: Colors.transparent,
+                          isScrollControlled: true,
+                          builder: (context) => const FilterWidget(),
+                        ),
                         child: Container(
                           height: 50,
                           width: 50,
@@ -269,7 +291,7 @@ class _ProductsPageState extends State<ProductsPage> {
                 const SizedBox(height: 20),
 
                 // Product Grid
-                Padding(
+                /*Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8.0),
                   child: GridView.builder(
                     itemCount: globalProductsList.length,
@@ -293,7 +315,24 @@ class _ProductsPageState extends State<ProductsPage> {
                             child: ItemTile1(
                               key: itemKey,
                               product: globalProductsList[index],
-                              active: true,
+                              curvedButton: CurvedButton(
+                                height: 60,
+                                width: 150,
+                                icon: Icons.add,
+                                color: const Color.fromARGB(255, 226, 239, 218),
+                                onTap: () {
+                                  context.read<ShoppingCartBloc>().add(
+                                        AddProduct(
+                                          ShoppingCartItem(
+                                              product:
+                                                  globalProductsList[index],
+                                              quantity: 1),
+                                        ),
+                                      );
+                                  _startAddToCartAnimation(itemKey);
+                                },
+                                product: globalProductsList[index],
+                              ),
                               onTap: () {
                                 Navigator.push(
                                   context,
@@ -304,23 +343,13 @@ class _ProductsPageState extends State<ProductsPage> {
                                   ),
                                 );
                               },
-                              onTapCurvedButton: () {
-                                context.read<ShoppingCartBloc>().add(
-                                      AddProduct(
-                                        ShoppingCartItem(
-                                            product: globalProductsList[index],
-                                            quantity: 1),
-                                      ),
-                                    );
-                                _startAddToCartAnimation(itemKey);
-                              },
                             ),
                           );
                         },
                       );
                     },
                   ),
-                ),
+                ),*/
 
                 const SizedBox(height: 20),
               ],

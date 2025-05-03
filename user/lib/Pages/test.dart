@@ -1,90 +1,114 @@
 import 'package:flutter/material.dart';
+import 'package:video_player/video_player.dart';
 
 void main() {
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Toggle List Example',
+      title: 'Video Button Demo',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const ToggleListExample(),
+      home: const VideoButtonPage(),
+      debugShowCheckedModeBanner: false,
     );
   }
 }
 
-class ToggleListExample extends StatefulWidget {
-  const ToggleListExample({super.key});
+class VideoButtonPage extends StatefulWidget {
+  const VideoButtonPage({Key? key}) : super(key: key);
 
   @override
-  _ToggleListExampleState createState() => _ToggleListExampleState();
+  State<VideoButtonPage> createState() => _VideoButtonPageState();
 }
 
-class _ToggleListExampleState extends State<ToggleListExample> {
-  bool showList = false;
+class _VideoButtonPageState extends State<VideoButtonPage> {
+  late VideoPlayerController _controller;
+  bool _isPlaying = false;
+  bool _isInitialized = false;
 
-  void _toggleList() {
-    setState(() {
-      showList = !showList;
+  @override
+  void initState() {
+    super.initState();
+    _controller = VideoPlayerController.asset(
+      'assets/videos/pickup.mp4',
+    )..initialize().then((_) {
+        setState(() {
+          _isInitialized = true;
+        });
+      });
+
+    // Listen to video end
+    _controller.addListener(() {
+      if (_controller.value.position >= _controller.value.duration &&
+          _controller.value.isInitialized &&
+          !_controller.value.isPlaying) {
+        setState(() {
+          _isPlaying = false;
+          _controller.seekTo(Duration.zero); // Reset the video position
+        });
+      }
     });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _handleTap() {
+    if (_isInitialized) {
+      setState(() {
+        _isPlaying = true;
+        _controller.play();
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Toggle List Example")),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            GestureDetector(
-              onTap: _toggleList,
-              child: Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.blueAccent,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      "Click me",
-                      style: TextStyle(color: Colors.white, fontSize: 16),
-                    ),
-                    Icon(
-                      showList ? Icons.arrow_drop_up : Icons.arrow_drop_down,
-                      color: Colors.white,
-                    ),
-                  ],
-                ),
-              ),
+      backgroundColor: Colors.blueGrey,
+      appBar: AppBar(title: const Text('Video Button Example')),
+      body: Center(
+        child: GestureDetector(
+          onTap: _handleTap,
+          child: Container(
+            width: MediaQuery.of(context).size.width - 50,
+            height: 120,
+            decoration: BoxDecoration(
+              color: Colors.blueAccent,
+              borderRadius: BorderRadius.circular(16),
             ),
-            if (showList)
-              Container(
-                height: 200,
-                margin: const EdgeInsets.only(top: 12),
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Colors.grey[200],
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: ListView.builder(
-                  itemCount: 5,
-                  itemBuilder: (context, index) {
-                    return ListTile(
-                      title: Text("Item ${index + 1}"),
-                    );
-                  },
-                ),
-              ),
-          ],
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(16),
+              child: _isPlaying
+                  ? _isInitialized
+                      ? FittedBox(
+                          fit: BoxFit.cover,
+                          clipBehavior: Clip.hardEdge,
+                          child: SizedBox(
+                            width: _controller.value.size.width,
+                            height: _controller.value.size.height,
+                            child: VideoPlayer(_controller),
+                          ),
+                        )
+                      : const Center(child: CircularProgressIndicator())
+                  : const Center(
+                      child: Text(
+                        'Tap to Play',
+                        style: TextStyle(color: Colors.white, fontSize: 18),
+                      ),
+                    ),
+            ),
+          ),
         ),
       ),
     );

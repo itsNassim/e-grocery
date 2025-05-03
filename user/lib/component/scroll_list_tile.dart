@@ -25,7 +25,7 @@ class ScrollListTile extends StatelessWidget {
             ),
             child: Center(
               child: ClipRRect(
-                child: Image.asset(
+                child: Image.network(
                   category.imageName,
                   height: 50,
                   width: 50,

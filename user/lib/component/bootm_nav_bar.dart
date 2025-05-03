@@ -46,7 +46,8 @@ class BootmNavBar extends StatelessWidget {
                 text: 'Home',
               ),
               GButton(
-                icon: Icons.format_list_bulleted_outlined,
+                icon: Icons
+                    .format_list_bulleted_outlined, //dashboard apps widgets ,
                 text: 'Category',
               ),
               GButton(

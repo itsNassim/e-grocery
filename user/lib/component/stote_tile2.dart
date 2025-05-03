@@ -1,21 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:user/classes/shop_class.dart';
 
 class StoreTile2 extends StatefulWidget {
-  final String imageName;
-  final String storeName;
+  final ShopClass store;
   final String price;
   final double rating;
   final bool isSelected;
   final double width;
+  final void Function()? onTap;
 
   const StoreTile2({
     super.key,
-    required this.imageName,
-    required this.storeName,
+    required this.store,
     required this.price,
     required this.rating,
     required this.isSelected,
     required this.width,
+    required this.onTap,
   });
 
   @override
@@ -44,7 +45,7 @@ class _StoreTile2State extends State<StoreTile2> {
           ClipRRect(
             borderRadius: BorderRadius.circular(35),
             child: Image.asset(
-              widget.imageName,
+              widget.store.imageUrl,
               height: 70,
               width: 70,
               fit: BoxFit.cover,
@@ -57,7 +58,7 @@ class _StoreTile2State extends State<StoreTile2> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  widget.storeName,
+                  widget.store.name,
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 22,
@@ -78,13 +79,39 @@ class _StoreTile2State extends State<StoreTile2> {
                 SizedBox(
                   height: 6,
                 ),
-                Text(
-                  "${widget.price}\$",
-                  style: const TextStyle(
-                    color: Colors.black54,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 17,
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "${widget.price}\$",
+                      style: const TextStyle(
+                        color: Colors.black54,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 17,
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: widget.onTap,
+                      child: Row(
+                        children: const [
+                          Text(
+                            "More details",
+                            style: TextStyle(
+                              color: Colors.black54,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14,
+                            ),
+                          ),
+                          SizedBox(width: 6),
+                          Icon(
+                            Icons.arrow_forward_ios,
+                            size: 16,
+                            color: Colors.black54,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 8),
               ],
