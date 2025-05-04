@@ -16,7 +16,8 @@ import 'package:user/classes/review_class.dart';
 
 import 'package:user/component/liked_page_containe.dart';
 import 'package:user/component/likes_page_products_tile.dart';
-import 'package:user/component/search_bar.dart';
+import 'package:user/component/search_bar/search_bar.dart';
+import 'package:user/component/search_bar/search_bar_placeholder.dart';
 import 'package:user/component/shopping_cart_icon.dart';
 import 'package:user/component/store_tile.dart';
 
@@ -96,7 +97,7 @@ class _LikesPageState extends State<LikesPage> {
                                 const EdgeInsets.symmetric(horizontal: 8.0),
                             child: Row(
                               children: [
-                                CustomSearchBar(width: width),
+                                SearchBarPlaceholder(),
                                 const SizedBox(width: 12),
                                 GestureDetector(
                                   onTap: () => Navigator.push(

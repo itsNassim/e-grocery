@@ -8,12 +8,16 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
+from django.db.models import Q
+from django.http import JsonResponse
 
 
 
 
 from django.contrib.auth.models import User
 from .serializers import *
+from .filters import *
 
 #Sing Up
 class RegisterView(generics.CreateAPIView):
@@ -326,14 +330,14 @@ class ReviewCreateView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, store_id):
-     
-        data = request.data
-        data['store'] = store_id
-        data['user'] = request.user.id  
-        serializer = ReviewSerializer(data=data)
+        store = get_object_or_404(Store, id=store_id)  # ✅ Get the store object
+        data = request.data.copy()                     # ✅ Always make a mutable copy of request.data
+        data['store'] = store_id                       # ✅ Use lowercase 'store'
+        data['user'] = request.user.id
 
+        serializer = ReviewSerializer(data=data)
         if serializer.is_valid():
-            serializer.save()
+            serializer.save(user=request.user, store=store)  # ✅ Pass actual objects
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -374,3 +378,46 @@ class UpdateOrderStatusView(APIView):
             return Response({"detail": "Order status updated."})
         except Order.DoesNotExist:
             return Response({"detail": "Order not found."}, status=status.HTTP_404_NOT_FOUND)
+
+class UserOrdersView(generics.ListAPIView):
+    serializer_class = OrderSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_staff:
+            return Order.objects.all()  # Admin can see all orders
+        return Order.objects.filter(user=user)  # Regular users see only their orders
+
+
+#-------<Product Filter>-------------
+class ProductFilterView(generics.ListAPIView):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = ProductFilter
+
+#-------<Search>-------------
+@api_view(['GET'])
+def search_view(request):
+    query = request.GET.get('q', '')
+
+    product_qs = Product.objects.filter(
+        Q(name__icontains=query) |
+        Q(base_slug__icontains=query) |
+        Q(category__name__icontains=query)
+    )
+
+    store_qs = Store.objects.filter(
+        Q(name__icontains=query) |
+        Q(email__icontains=query) |
+        Q(address__icontains=query)
+    )
+
+    product_data = ProductSerializer(product_qs, many=True, context={'request': request}).data
+    store_data = StoreSerializer(store_qs, many=True, context={'request': request}).data
+
+    return Response({
+        'products': product_data,
+        'stores': store_data
+    })

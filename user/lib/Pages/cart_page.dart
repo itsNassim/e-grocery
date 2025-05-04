@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:user/Backgrounds/background_2.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:user/backend/shopping_cart/orders.dart';
 import 'package:user/blocs/shopping_cart_bloc.dart';
 import 'package:user/classes/order_class.dart';
 
@@ -35,18 +36,21 @@ class _CartPageState extends State<CartPage> {
           total: total,
           function: (selectedMethod) {
             final cartItems = context.read<ShoppingCartBloc>().state.cartItems;
-
-            setState(() {
-             /* globalOrdersList.add(OrderClass(
-                ID: globalOrdersList.length + 1,
-                Status: "confirmed",
-                date: DateTime.now().toString().split(' ')[0],
-                paymentMethod: selectedMethod,
-                total: total,
-                items: cartItems,
-              ));*/
-            });
-
+            Order order = Order(
+              id: 0,
+              status: "confirmed",
+              payment_method: selectedMethod,
+              createdAt: DateTime.now().toIso8601String(),
+              items: cartItems.map((item) {
+                return OrderItem(
+                  id: 0,
+                  quantity: item.quantity,
+                  price: double.parse(item.product.price),
+                  product: item.product,
+                );
+              }).toList(),
+            );
+            createOrder(order);
             context.read<ShoppingCartBloc>().add(ClearCartEvent());
           },
         );

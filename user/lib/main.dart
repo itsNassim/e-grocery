@@ -19,25 +19,14 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
 
-
   await Hive.openBox("mybox");
 
-  final cartApiService = await CartApiService.create();
-  final likeslistApiService = await LikeslistApiService.create();
-
-  runApp(MyApp(
-    cartApiService: cartApiService,
-    likeslistApiService: likeslistApiService,
-  ));
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  final CartApiService cartApiService;
-  final LikeslistApiService likeslistApiService;
   MyApp({
     super.key,
-    required this.cartApiService,
-    required this.likeslistApiService,
   });
 
   @override
@@ -48,16 +37,16 @@ class MyApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (_) => DataBloc()),
-        BlocProvider(create: (_) => ShoppingCartBloc(cartApiService)),
+        BlocProvider(create: (_) => ShoppingCartBloc(CartApiService())),
         BlocProvider(
-            create: (_) => LikeslistBloc(apiService: likeslistApiService)),
+            create: (_) => LikeslistBloc(apiService: LikeslistApiService())),
         BlocProvider(create: (_) => LikedStoresBloc()),
         BlocProvider(
             create: (_) => ReviewBloc(reviewRepository: ReviewRepository())),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        title: 'Flutter Demo',
+        title: 'Freshly',
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: Color(0xFF013033)),
           useMaterial3: true,

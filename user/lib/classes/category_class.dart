@@ -1,22 +1,23 @@
 class Category {
+  final int id;
   final String imageName;
   final String name;
   Category({
+    required this.id,
     required this.imageName,
     required this.name,
   });
 
   factory Category.fromJson(Map<String, dynamic> json) {
     return Category(
-      imageName: json['image'], 
+      id: json["id"],
+      imageName: json['image'],
       name: json['name'],
     );
   }
-
-  
 }
 
-List<Category> GolbelCategoryList = [
+/*List<Category> GolbelCategoryList = [
   Category(imageName: "assets/icons/category_Icons/Meets.png", name: "Meets"),
   Category(
       imageName: "assets/icons/category_Icons/Vegetable.png",
@@ -30,3 +31,4 @@ List<Category> GolbelCategoryList = [
   Category(
       imageName: "assets/icons/category_Icons/Chicken.png", name: "Chicken"),
 ];
+*/

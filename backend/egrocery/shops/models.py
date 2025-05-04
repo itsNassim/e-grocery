@@ -134,13 +134,12 @@ class Review(models.Model):
 
 
 
-
 class Order(models.Model):
     STATUS_CHOICES = [
         ('confirmed', 'Confirmed'),
         ('processing', 'Processing'),
         ('shipped', 'Shipped'),
-        ('delivery', 'Out for Delivery'),
+        ('delivery', 'Delivery'),
         ('pickedup', 'Picked Up'),
         ('cancelled', 'Cancelled'),
     ]
@@ -154,7 +153,6 @@ class Order(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='confirmed')
     date = models.DateTimeField(auto_now_add=True)
     payment_method = models.CharField(max_length=20, choices=PAYMENT_METHOD_CHOICES)
-    total = models.DecimalField(max_digits=10, decimal_places=2)
 
     def __str__(self):
         return f"Order #{self.id} - {self.user.full_name}"
@@ -164,7 +162,7 @@ class OrderItem(models.Model):
     order = models.ForeignKey(Order, related_name='items', on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField()
-    price = models.DecimalField(max_digits=10, decimal_places=2)  # price at time of order
+    price = models.DecimalField(max_digits=10, decimal_places=2) 
 
     def __str__(self):
         return f"{self.quantity} x {self.product.name}"

@@ -21,8 +21,17 @@ Future<List<ShopClass>> fetchLikedStores() async {
   );
 
   if (response.statusCode == 200) {
-    final data = jsonDecode(response.body) as List;
-    return data.map((e) => ShopClass.fromJson(e)).toList();
+    final decoded = jsonDecode(response.body);
+
+    if (decoded is Map<String, dynamic> && decoded.containsKey('stores')) {
+      final List<dynamic> storeList = decoded['stores'];
+      return storeList
+          .map((storeData) =>
+              ShopClass.fromJson(storeData as Map<String, dynamic>))
+          .toList();
+    } else {
+      throw Exception('Unexpected response format');
+    }
   } else {
     throw Exception('Failed to load liked stores');
   }
@@ -35,7 +44,7 @@ Future<void> addStoreToLiked(int storeId) async {
   }
 
   final headers = {
-    'Authorization': 'Bearer $token', // Corrected Authorization header format
+    'Authorization': 'Bearer $token',
     'Content-Type': 'application/json',
   };
 
@@ -57,7 +66,7 @@ Future<void> removeStoreFromLiked(int storeId) async {
   }
 
   final headers = {
-    'Authorization': 'Bearer $token', // Corrected Authorization header format
+    'Authorization': 'Bearer $token',
     'Content-Type': 'application/json',
   };
 

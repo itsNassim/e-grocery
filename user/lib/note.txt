@@ -1,4 +1,6 @@
-review 
-orders
-filter
-search
+
+
+
+
+other stores detail page
+store owner

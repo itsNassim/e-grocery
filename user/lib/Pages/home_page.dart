@@ -26,7 +26,8 @@ import 'package:user/component/Item_tile2.dart';
 import 'package:user/component/curved_button.dart';
 import 'package:user/component/item_tile1.dart';
 import 'package:user/component/scroll_list_tile.dart';
-import 'package:user/component/search_bar.dart';
+import 'package:user/component/search_bar/search_bar.dart';
+import 'package:user/component/search_bar/search_bar_placeholder.dart';
 import 'package:user/component/shopping_cart_icon.dart';
 import 'package:user/component/store_tile.dart';
 
@@ -165,14 +166,14 @@ class _HomePageState extends State<HomePage> {
                                 ),
                               ),
                               Positioned(
-                                top: 10,
+                                top: 20,
                                 left: 0,
                                 child: Padding(
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 8.0),
                                   child: Row(
                                     children: [
-                                      CustomSearchBar(width: width),
+                                      SearchBarPlaceholder(),
                                       const SizedBox(width: 12),
                                       GestureDetector(
                                         onTap: () => Navigator.push(
@@ -316,6 +317,10 @@ class _HomePageState extends State<HomePage> {
                             scrollDirection: Axis.horizontal,
                             itemCount: storesList.length,
                             itemBuilder: (context, index) {
+                              ReviewBloc _reviewBloc =
+                                  BlocProvider.of<ReviewBloc>(context);
+                              _reviewBloc
+                                  .add(FetchReviewsEvent(storesList[index].id));
                               return GestureDetector(
                                 onTap: () {
                                   Navigator.push(

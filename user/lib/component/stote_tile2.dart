@@ -44,7 +44,7 @@ class _StoreTile2State extends State<StoreTile2> {
         children: [
           ClipRRect(
             borderRadius: BorderRadius.circular(35),
-            child: Image.asset(
+            child: Image.network(
               widget.store.imageUrl,
               height: 70,
               width: 70,

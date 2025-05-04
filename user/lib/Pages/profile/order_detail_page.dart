@@ -3,14 +3,20 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:user/Backgrounds/background_2.dart';
 import 'package:user/classes/order_class.dart';
+import 'package:user/classes/shopping_cart_class.dart';
 import 'package:user/component/shopping_cart-item_tile.dart';
 
 class OrderDetailPage extends StatelessWidget {
-  final OrderClass order;
+  final Order order;
   OrderDetailPage({
     super.key,
     required this.order,
   });
+
+  double getOrderTotal(Order order) {
+    return order.items
+        .fold(0.0, (sum, item) => sum + item.quantity * item.price);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +59,9 @@ class OrderDetailPage extends StatelessWidget {
                         itemCount: order.items.length,
                         itemBuilder: (context, index) {
                           return ShoppingCartItemTile(
-                            cartItem: order.items[index],
+                            cartItem: ShoppingCartItem(
+                                product: order.items[index].product,
+                                quantity: order.items[index].quantity),
                             active: false,
                             increment: () {},
                             decrement: () {},
@@ -73,7 +81,7 @@ class OrderDetailPage extends StatelessWidget {
                                 fontSize: 18, fontWeight: FontWeight.w600),
                           ),
                           Text(
-                            "${order.total.toStringAsFixed(2)}DA",
+                            "${getOrderTotal(order).toStringAsFixed(2)} DA",
                             style: const TextStyle(
                                 fontSize: 18, fontWeight: FontWeight.bold),
                           ),
@@ -92,7 +100,7 @@ class OrderDetailPage extends StatelessWidget {
                                 fontSize: 18, fontWeight: FontWeight.w600),
                           ),
                           Text(
-                            order.paymentMethod,
+                            order.payment_method,
                             style: const TextStyle(
                                 fontSize: 18, fontWeight: FontWeight.bold),
                           ),

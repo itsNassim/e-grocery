@@ -82,8 +82,10 @@ class ReviewBloc extends Bloc<ReviewEvent, ReviewState> {
         event.text,
         event.rating,
       );
+      add(FetchReviewsEvent(event.storeId));
       emit(ReviewAddedState(review));
     } catch (e) {
+      print(e);
       emit(ReviewErrorState('Error adding review'));
     }
   }
@@ -94,6 +96,7 @@ class ReviewBloc extends Bloc<ReviewEvent, ReviewState> {
     emit(ReviewLoadingState());
     try {
       await reviewRepository.removeReview(event.storeId, event.reviewId);
+      add(FetchReviewsEvent(event.storeId));
       emit(ReviewRemovedState(event.reviewId));
     } catch (e) {
       emit(ReviewErrorState('Error removing review'));
