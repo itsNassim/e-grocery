@@ -111,30 +111,35 @@ class LikedStoresSerializer(serializers.ModelSerializer):
 
 #review
 class ReviewSerializer(serializers.ModelSerializer):
-    user = UserUpdateSerializer()
+    user = UserUpdateSerializer(read_only=True)
+
     class Meta:
         model = Review
-        fields = [ 'user', 'text', 'rating']
+        fields = ['id', 'user', 'text', 'rating']
+
 
 #order
 class OrderItemSerializer(serializers.ModelSerializer):
-    product = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all())
+    product = ProductSerializer(read_only=True)  
+    product_id = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all(), write_only=True)  
 
     class Meta:
         model = OrderItem
-        fields = ['product', 'quantity', 'price']
+        fields = ['product', 'product_id', 'quantity', 'price']
 
 class OrderSerializer(serializers.ModelSerializer):
     items = OrderItemSerializer(many=True)
+    date = serializers.DateTimeField(format="%Y-%m-%d", read_only=True)
     
     class Meta:
         model = Order
-        fields = ['id', 'user', 'status', 'payment_method', 'total', 'items']
+        fields = ['id','user', 'status', 'payment_method', 'date', 'items']
         read_only_fields = ['id', 'status']  
 
     def create(self, validated_data):
         items_data = validated_data.pop('items')
         order = Order.objects.create(**validated_data)
         for item_data in items_data:
-            OrderItem.objects.create(order=order, **item_data)
+            product = item_data.pop('product_id')  # extract product_id
+            OrderItem.objects.create(order=order, product=product, **item_data)
         return order

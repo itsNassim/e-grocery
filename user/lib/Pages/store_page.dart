@@ -4,6 +4,9 @@ import 'package:user/Backgrounds/backgound_1.dart';
 import 'package:user/Pages/cart_page.dart';
 import 'package:user/Pages/detail-page.dart';
 import 'package:user/Pages/products_page.dart';
+import 'package:user/backend/base.dart';
+import 'package:user/backend/product/product_filter.dart';
+import 'package:user/backend/user/user.dart';
 import 'package:user/blocs/data_bloc.dart';
 import 'package:user/blocs/liked_stores_bloc.dart';
 import 'package:user/blocs/review_bloc.dart';
@@ -13,11 +16,12 @@ import 'package:user/classes/products_class.dart';
 import 'package:user/classes/review_class.dart';
 import 'package:user/classes/shop_class.dart';
 import 'package:user/classes/shopping_cart_class.dart';
+import 'package:user/classes/user_class.dart';
 import 'package:user/component/FlyingItemAnimation.dart';
 import 'package:user/component/Item_tile1.dart';
 import 'package:user/component/curved_button.dart';
 import 'package:user/component/scroll_list_tile.dart';
-import 'package:user/component/search_bar.dart';
+import 'package:user/component/search_bar/search_bar.dart';
 import 'package:user/component/shopping_cart_icon.dart';
 import 'package:user/component/store_tile3.dart';
 
@@ -36,6 +40,8 @@ class _StorePageState extends State<StorePage> {
   int selectedStars = 0;
   late ReviewBloc _reviewBloc;
   List<Category> categoryList = [];
+  List<Product> productList = [];
+  late User user;
 
   Offset _getWidgetPosition(GlobalKey key) {
     final renderBox = key.currentContext?.findRenderObject() as RenderBox?;
@@ -44,14 +50,52 @@ class _StorePageState extends State<StorePage> {
         : Offset.zero;
   }
 
+  Future<List<Product>> getFilterList() async {
+    final list = await fetchFilteredProducts(
+      storeId: widget.store.id,
+    );
+
+    return list;
+  }
+
+  void _loadFilteredProducts() async {
+    final filtered = await getFilterList();
+    setState(() {
+      productList = filtered;
+    });
+  }
+
+  Future<User> getUser() async {
+    try {
+      final token = await getToken();
+      final userInfo = await fetchUserInfo(token!);
+      return User.fromJson(userInfo!);
+    } catch (e) {
+      throw Exception('Failed to load user: $e');
+    }
+  }
+
+  void _getUser() async {
+    final currentUser = await getUser();
+    setState(() {
+      user = currentUser;
+    });
+  }
+
   @override
   void initState() {
     super.initState();
+    user = User(
+      ID: 0,
+      fullName: "",
+      email: "",
+      phoneNumber: "",
+    );
     _reviewBloc = BlocProvider.of<ReviewBloc>(context);
-    _reviewBloc.add(FetchReviewsEvent(widget.store.id));
+    _loadFilteredProducts();
+    _getUser();
   }
 
-  // ignore: unused_element
   void _startAddToCartAnimation(GlobalKey itemKey) {
     final overlay = Overlay.of(context);
     final start = _getWidgetPosition(itemKey);
@@ -89,7 +133,6 @@ class _StorePageState extends State<StorePage> {
                 child: Column(
                   children: [
                     _buildTopSection(height, width),
-                    _buildSearchAndFilter(width),
                     const SizedBox(height: 20),
                     _buildCategories(),
                     const SizedBox(height: 20),
@@ -234,31 +277,6 @@ class _StorePageState extends State<StorePage> {
     );
   }
 
-  Widget _buildSearchAndFilter(double width) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-      child: Row(
-        children: [
-          CustomSearchBar(width: width),
-          const SizedBox(width: 12),
-          GestureDetector(
-            child: Container(
-              height: 50,
-              width: 50,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(35),
-              ),
-              child: const Center(
-                child: Icon(Icons.filter_list_rounded, size: 40),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildCategories() {
     return BlocBuilder<DataBloc, DataState>(
       builder: (context, state) {
@@ -266,95 +284,145 @@ class _StorePageState extends State<StorePage> {
           categoryList = state.categories;
         }
 
-        return SizedBox(
-          height: 120,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            itemCount: categoryList.length,
-            itemBuilder: (context, index) {
-              return GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ProductsPage(
-                        selectedCategoryIndex: index + 1,
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 12.0),
+              child: Text(
+                "Categories",
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              ),
+            ),
+            const SizedBox(height: 8),
+            SizedBox(
+              height: 120,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: categoryList.length,
+                itemBuilder: (context, index) {
+                  return GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ProductsPage(
+                            selectedCategoryIndex: index + 1,
+                            storeName: widget.store.name,
+                          ),
+                        ),
+                      );
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: ScrollListTile(
+                        category: categoryList[index],
                       ),
                     ),
                   );
                 },
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: ScrollListTile(
-                    category: categoryList[index],
-                  ),
-                ),
-              );
-            },
-          ),
+              ),
+            ),
+          ],
         );
       },
     );
   }
 
   Widget _buildBestSellingSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 12.0),
-          child: Text(
-            "Best selling",
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+    if (productList.isEmpty) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: const [
+              Icon(
+                Icons.inventory_2_outlined,
+                size: 64,
+                color: Colors.grey,
+              ),
+              SizedBox(height: 16),
+              Text(
+                'No Products Found',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black54,
+                ),
+              ),
+              SizedBox(height: 8),
+              Text(
+                'We couldn’t find any products matching your this store',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
           ),
         ),
-        const SizedBox(height: 8),
-        /*SizedBox(
-          height: 300,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            itemCount: globalProductsList.length,
-            itemBuilder: (context, index) {
-              final itemKey = GlobalKey();
-              final product = globalProductsList[index];
-              return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                child: ItemTile1(
-                  key: itemKey,
-                  product: product,
-                  curvedButton: CurvedButton(
-                    height: 60,
-                    width: 150,
-                    icon: Icons.add,
-                    color: const Color.fromARGB(255, 226, 239, 218),
-                    onTap: () {
-                      context.read<ShoppingCartBloc>().add(
-                            AddProduct(
-                              ShoppingCartItem(
-                                product: product,
-                                quantity: 1,
-                              ),
-                            ),
-                          );
-                      _startAddToCartAnimation(itemKey);
-                    },
-                    product: product,
-                  ),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => DetailPage(product: product),
-                      ),
-                    );
-                  },
-                ),
-              );
-            },
+      );
+    } else {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 12.0),
+            child: Text(
+              "All Items",
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
           ),
-        ),*/
-      ],
-    );
+          const SizedBox(height: 8),
+          SizedBox(
+            height: 300,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: productList.length,
+              itemBuilder: (context, index) {
+                final itemKey = GlobalKey();
+                final product = productList[index];
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                  child: ItemTile1(
+                    key: itemKey,
+                    product: product,
+                    curvedButton: CurvedButton(
+                      height: 60,
+                      width: 150,
+                      icon: Icons.add,
+                      color: const Color.fromARGB(255, 226, 239, 218),
+                      onTap: () {
+                        context.read<ShoppingCartBloc>().add(
+                              AddProduct(
+                                ShoppingCartItem(
+                                  product: product,
+                                  quantity: 1,
+                                ),
+                              ),
+                            );
+                        _startAddToCartAnimation(itemKey);
+                      },
+                      product: product,
+                    ),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => DetailPage(product: product),
+                        ),
+                      );
+                    },
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      );
+    }
   }
 
   Widget _buildLeaveReviewSection() {
@@ -452,19 +520,55 @@ class _StorePageState extends State<StorePage> {
                 ),
               ),
               const SizedBox(height: 10),
-              ListView.builder(
-                physics: const NeverScrollableScrollPhysics(),
-                shrinkWrap: true,
-                itemCount: state.reviews.length,
-                itemBuilder: (context, index) {
-                  final review = state.reviews[index];
-                  return Padding(
+              if (state.reviews.isEmpty)
+                Center(
+                  child: Padding(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 12.0, vertical: 8),
-                    child: _buildReviewCard(review),
-                  );
-                },
-              ),
+                        vertical: 40, horizontal: 20),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: const [
+                        Icon(
+                          Icons.rate_review_outlined,
+                          size: 64,
+                          color: Colors.grey,
+                        ),
+                        SizedBox(height: 16),
+                        Text(
+                          'No Reviews Yet',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black54,
+                          ),
+                        ),
+                        SizedBox(height: 8),
+                        Text(
+                          'This store hasn’t received any reviews yet.',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              else
+                ListView.builder(
+                  physics: const NeverScrollableScrollPhysics(),
+                  shrinkWrap: true,
+                  itemCount: state.reviews.length,
+                  itemBuilder: (context, index) {
+                    final review = state.reviews[index];
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12.0, vertical: 8),
+                      child: _buildReviewCard(review),
+                    );
+                  },
+                ),
             ],
           );
         } else {
@@ -512,8 +616,26 @@ class _StorePageState extends State<StorePage> {
               ),
             ),
           ),
+          if (user.ID == review.user.ID)
+            Padding(
+              padding: const EdgeInsets.only(top: 8.0),
+              child: IconButton(
+                icon: const Icon(Icons.delete, color: Colors.red),
+                onPressed: () {
+                  _deleteReview(review);
+                },
+              ),
+            ),
         ],
       ),
     );
+  }
+
+  void _deleteReview(Review review) {
+    // Call the appropriate Bloc or method to delete the review
+    // For example, calling ReviewBloc to delete the review:
+    context
+        .read<ReviewBloc>()
+        .add(RemoveReviewEvent(widget.store.id, review.Id));
   }
 }

@@ -6,25 +6,17 @@ import 'package:user/backend/base.dart';
 import 'package:user/classes/shopping_cart_class.dart';
 
 class CartApiService {
-  final String? accessToken;
-
-  CartApiService._(this.accessToken);
-
-  static Future<CartApiService> create() async {
-    final box = Hive.box("mybox");
-    final token = box.get('token');
-    final refreshToken = token["refresh"];
-    final accessToken = await refreshAccessToken(refreshToken);
-    print("access Token : $accessToken");
-    return CartApiService._(accessToken);
-  }
-
-  Map<String, String> get headers => {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer $accessToken",
-      };
-
   Future<List<ShoppingCartItem>> fetchCart() async {
+    final token = await getToken();
+    if (token == null) {
+      throw Exception('Failed to retrieve token');
+    }
+
+    final headers = {
+      'Authorization': 'Bearer $token',
+      'Content-Type': 'application/json',
+    };
+
     final response =
         await http.get(Uri.parse('$baseUrl/cart/'), headers: headers);
 
@@ -38,6 +30,16 @@ class CartApiService {
   }
 
   Future<void> addToCart(String productId, int quantity) async {
+    final token = await getToken();
+    if (token == null) {
+      throw Exception('Failed to retrieve token');
+    }
+
+    final headers = {
+      'Authorization': 'Bearer $token',
+      'Content-Type': 'application/json',
+    };
+
     final body = json.encode({'product_id': productId, 'quantity': quantity});
     final response = await http.post(Uri.parse('$baseUrl/cart/add/'),
         headers: headers, body: body);
@@ -45,6 +47,16 @@ class CartApiService {
   }
 
   Future<void> removeFromCart(String productId) async {
+    final token = await getToken();
+    if (token == null) {
+      throw Exception('Failed to retrieve token');
+    }
+
+    final headers = {
+      'Authorization': 'Bearer $token',
+      'Content-Type': 'application/json',
+    };
+
     final response = await http.delete(
         Uri.parse('$baseUrl/cart/remove/$productId/'),
         headers: headers);
@@ -52,6 +64,16 @@ class CartApiService {
   }
 
   Future<void> updateQuantity(String productId, int quantity) async {
+    final token = await getToken();
+    if (token == null) {
+      throw Exception('Failed to retrieve token');
+    }
+
+    final headers = {
+      'Authorization': 'Bearer $token',
+      'Content-Type': 'application/json',
+    };
+
     final body = json.encode({'product_id': productId, 'quantity': quantity});
     final response = await http.patch(Uri.parse('$baseUrl/cart/update/'),
         headers: headers, body: body);
@@ -61,6 +83,16 @@ class CartApiService {
   }
 
   Future<void> clearCart() async {
+    final token = await getToken();
+    if (token == null) {
+      throw Exception('Failed to retrieve token');
+    }
+
+    final headers = {
+      'Authorization': 'Bearer $token',
+      'Content-Type': 'application/json',
+    };
+
     final response =
         await http.post(Uri.parse('$baseUrl/cart/clear/'), headers: headers);
     if (response.statusCode != 200) throw Exception("Failed to clear cart");

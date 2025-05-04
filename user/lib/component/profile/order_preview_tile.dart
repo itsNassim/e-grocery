@@ -10,7 +10,7 @@ class OrderPreviewTile extends StatelessWidget {
     required this.onPressed,
   });
 
-  final OrderClass order;
+  final Order order;
   final void Function() onTap;
   final void Function(BuildContext)? onPressed;
 
@@ -50,7 +50,7 @@ class OrderPreviewTile extends StatelessWidget {
                       const Text('Order ID:'),
                       const SizedBox(width: 5),
                       Text(
-                        order.ID.toString(),
+                        order.id.toString(),
                         style: Theme.of(context)
                             .textTheme
                             .bodyLarge
@@ -58,7 +58,7 @@ class OrderPreviewTile extends StatelessWidget {
                       ),
                       const Spacer(),
                       Text(
-                        order.date,
+                        order.createdAt,
                         style: TextStyle(color: Colors.grey[600], fontSize: 13),
                       ),
                     ],
@@ -87,7 +87,7 @@ class OrderPreviewTile extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
                             Opacity(
-                              opacity: order.Status == "confirmed" ? 1 : 0,
+                              opacity: order.status == "confirmed" ? 1 : 0,
                               child: Text(
                                 'Confirmed',
                                 style: Theme.of(context)
@@ -97,7 +97,7 @@ class OrderPreviewTile extends StatelessWidget {
                               ),
                             ),
                             Opacity(
-                              opacity: order.Status == "processing" ? 1 : 0,
+                              opacity: order.status == "processing" ? 1 : 0,
                               child: Text(
                                 'Processing',
                                 style: Theme.of(context)
@@ -107,7 +107,7 @@ class OrderPreviewTile extends StatelessWidget {
                               ),
                             ),
                             Opacity(
-                              opacity: order.Status == "shipped" ? 1 : 0,
+                              opacity: order.status == "shipped" ? 1 : 0,
                               child: Text(
                                 'Shipped',
                                 style: Theme.of(context)
@@ -118,13 +118,13 @@ class OrderPreviewTile extends StatelessWidget {
                             ),
                             Row(
                               children: [
-                                if (order.Status == "delivery" ||
-                                    order.Status == "picked up" ||
-                                    order.Status == "cancelled")
+                                if (order.status == "delivery" ||
+                                    order.status == "picked up" ||
+                                    order.status == "cancelled")
                                   Text(
-                                    order.Status == "delivery"
+                                    order.status == "delivery"
                                         ? 'Delivery'
-                                        : order.Status == "picked up"
+                                        : order.status == "picked up"
                                             ? 'Picked Up'
                                             : 'Cancelled',
                                     style: Theme.of(context)
@@ -149,7 +149,7 @@ class OrderPreviewTile extends StatelessWidget {
   }
 
   double _orderSliderValue() {
-    switch (order.Status) {
+    switch (order.status) {
       case "confirmed":
         return 0;
       case "processing":
@@ -166,7 +166,7 @@ class OrderPreviewTile extends StatelessWidget {
   }
 
   Color _orderColor() {
-    switch (order.Status) {
+    switch (order.status) {
       case "confirmed":
         return const Color(0xFF4044AA);
       case "processing":

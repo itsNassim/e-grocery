@@ -54,9 +54,7 @@ class Product {
       };
 }
 
-custom.Category getCategoryByName(String name) {
-  return custom.GolbelCategoryList.firstWhere((cat) => cat.name == name);
-}
+
 
 /*List<Product> globalProductsList = [
   Product(

@@ -47,7 +47,7 @@ class PrivacyPage extends StatelessWidget {
                         ),
                         const SizedBox(height: 20),
                         const Text(
-                          "At eGrocery Shops, we value your privacy and are committed to protecting your personal information. "
+                          "At Freshly, we value your privacy and are committed to protecting your personal information. "
                           "This Privacy Policy explains how we collect, use, and safeguard your data when you use our app.",
                           style: TextStyle(fontSize: 16, height: 1.5),
                         ),

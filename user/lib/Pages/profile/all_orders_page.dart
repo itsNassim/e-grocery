@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:user/Backgrounds/background_2.dart';
 import 'package:user/Pages/profile/order_detail_page.dart';
+import 'package:user/backend/shopping_cart/orders.dart';
 import 'package:user/classes/order_class.dart';
 import 'package:user/component/profile/order_preview_tile.dart';
 
@@ -12,6 +13,21 @@ class AllOrdersPage extends StatefulWidget {
 }
 
 class _AllOrdersPageState extends State<AllOrdersPage> {
+  late List<Order> _orders;
+  @override
+  void initState() {
+    super.initState();
+    _orders = [];
+    getOrders();
+  }
+
+  Future<void> getOrders() async {
+    final orders = await fetchOrders();
+    setState(() {
+      _orders = orders;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
@@ -23,35 +39,33 @@ class _AllOrdersPageState extends State<AllOrdersPage> {
           height: height - toppadding - bottompadding,
           child: Stack(
             children: [
-              /*Padding(
+              Padding(
                 padding: EdgeInsets.only(top: height * 0.15),
                 child: ListView.builder(
-                  itemCount: globalOrdersList.length,
+                  itemCount: _orders.length,
                   itemBuilder: (context, index) {
-                    OrderClass order = globalOrdersList[index];
+                    Order order = _orders[index];
                     return OrderPreviewTile(
-                      order: order,
-                      onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => OrderDetailPage(
-                            order: order,
-                          ),
-                        ),
-                      ),
-                      onPressed: (p0) {
-                        setState(() {
-                          if (order.Status != "picked up" &&
-                              order.Status != "delivery" &&
-                              order.Status != "cancelled") {
-                           // globalOrdersList[index].Status = "cancelled";
+                        order: order,
+                        onTap: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => OrderDetailPage(
+                                  order: order,
+                                ),
+                              ),
+                            ),
+                        onPressed: (p0) async {
+                          if (order.status != "picked up" &&
+                              order.status != "delivery" &&
+                              order.status != "cancelled") {
+                            await updateOrderStatus(order.id, "cancelled");
+                            await getOrders();
                           }
                         });
-                      },
-                    );
                   },
                 ),
-              ),*/
+              ),
               SizedBox(
                 height: height * 0.15,
                 child: Stack(

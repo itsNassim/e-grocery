@@ -8,7 +8,8 @@ import 'package:user/blocs/data_bloc.dart';
 import 'package:user/blocs/shopping_cart_bloc.dart';
 import 'package:user/classes/category_class.dart';
 import 'package:user/component/category_tile.dart';
-import 'package:user/component/search_bar.dart';
+import 'package:user/component/search_bar/search_bar.dart';
+import 'package:user/component/search_bar/search_bar_placeholder.dart';
 import 'package:user/component/shopping_cart_icon.dart';
 
 class CategoryPage extends StatefulWidget {
@@ -67,7 +68,7 @@ class _CategoryPageState extends State<CategoryPage> {
                                 const EdgeInsets.symmetric(horizontal: 8.0),
                             child: Row(
                               children: [
-                                CustomSearchBar(width: width),
+                                SearchBarPlaceholder(),
                                 SizedBox(
                                   width: 12,
                                 ),

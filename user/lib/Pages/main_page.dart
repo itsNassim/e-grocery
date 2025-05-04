@@ -5,6 +5,7 @@ import 'package:user/Pages/home_page.dart';
 import 'package:user/Pages/likes_page.dart';
 import 'package:user/Pages/profile_page.dart';
 import 'package:user/blocs/data_bloc.dart';
+import 'package:user/blocs/liked_stores_bloc.dart';
 import 'package:user/blocs/shopping_cart_bloc.dart';
 import 'package:user/component/bootm_nav_bar.dart';
 
@@ -17,6 +18,7 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> {
   int _selectedIndex = 0;
+  bool _isKeyboardVisible = false;
 
   final List<Widget> _pages = [
     HomePage(),
@@ -25,11 +27,26 @@ class _MainPageState extends State<MainPage> {
     ProfilePage(),
   ];
 
+  final FocusNode _focusNode = FocusNode();
+
   @override
   void initState() {
     super.initState();
     context.read<DataBloc>().add(LoadDataEvent());
     context.read<ShoppingCartBloc>().add(RefreshCart());
+    context.read<LikedStoresBloc>().add(FetchLikedStoresEvent());
+
+    _focusNode.addListener(() {
+      setState(() {
+        _isKeyboardVisible = _focusNode.hasFocus;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    super.dispose();
   }
 
   @override
@@ -64,27 +81,29 @@ class _MainPageState extends State<MainPage> {
                     }
                   }
                 },
-                child: SizedBox(
-                  height: height - toppadding - bottompadding,
-                  child: Stack(
-                    children: [
-                      _pages[_selectedIndex],
-                      Positioned(
-                        bottom: 0,
-                        left: 0,
-                        right: 0,
-                        child: MediaQuery.of(context).viewInsets.bottom == 0
-                            ? BootmNavBar(
-                                onTabChange: (index) {
-                                  setState(() {
-                                    _selectedIndex = index;
-                                  });
-                                },
-                                selectedIndex: _selectedIndex,
-                              )
-                            : const SizedBox.shrink(),
-                      ),
-                    ],
+                child: SingleChildScrollView(
+                  child: SizedBox(
+                    height: height - toppadding - bottompadding,
+                    child: Stack(
+                      children: [
+                        _pages[_selectedIndex],
+                        Positioned(
+                          bottom: 0,
+                          left: 0,
+                          right: 0,
+                          child: _isKeyboardVisible
+                              ? const SizedBox.shrink()
+                              : BootmNavBar(
+                                  onTabChange: (index) {
+                                    setState(() {
+                                      _selectedIndex = index;
+                                    });
+                                  },
+                                  selectedIndex: _selectedIndex,
+                                ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               );

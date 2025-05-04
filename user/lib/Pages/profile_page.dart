@@ -18,7 +18,8 @@ import 'package:user/backend/auth/auth.dart';
 import 'package:user/backend/user/user.dart';
 import 'package:user/blocs/shopping_cart_bloc.dart';
 import 'package:user/classes/user_class.dart';
-import 'package:user/component/search_bar.dart';
+import 'package:user/component/search_bar/search_bar.dart';
+import 'package:user/component/search_bar/search_bar_placeholder.dart';
 import 'package:user/component/shopping_cart_icon.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -31,7 +32,6 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   late User user;
   var box = Hive.box("mybox");
-  bool isLoading = true;
 
   @override
   void initState() {
@@ -42,7 +42,6 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<void> loadUserInfo() async {
-    setState(() => isLoading = true);
     final tokenMap = box.get("token");
     final refreshToken = tokenMap?["refresh"];
 
@@ -52,15 +51,12 @@ class _ProfilePageState extends State<ProfilePage> {
       if (userInfo != null) {
         setState(() {
           user = User.fromJson(userInfo);
-          isLoading = false;
         });
       } else {
         print('Failed to fetch user info');
-        setState(() => isLoading = false);
       }
     } else {
       print('Refresh token invalid or expired');
-      setState(() => isLoading = false);
     }
   }
 
@@ -96,7 +92,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             ),
                           ),
                           Positioned(
-                            top: 15,
+                            top: 20,
                             left: 0,
                             right: 0,
                             child: Padding(
@@ -104,7 +100,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                   const EdgeInsets.symmetric(horizontal: 8.0),
                               child: Row(
                                 children: [
-                                  CustomSearchBar(width: width),
+                                  SearchBarPlaceholder(),
                                   const SizedBox(width: 12),
                                   GestureDetector(
                                     onTap: () => Navigator.push(

@@ -37,15 +37,43 @@ class ShoppingCartAdmin(admin.ModelAdmin):
 class LikeslistAdmin(admin.ModelAdmin):
     list_display = ("user","title")
     list_filter = ("user",)
+
+@admin.register(LikedStores)
+class LikedStoresAdmin(admin.ModelAdmin):
+    list_display = ('user', 'store_count')
+    search_fields = ('user__full_name', 'user__email')
+    filter_horizontal = ('stores',)
+
+    def store_count(self, obj):
+        return obj.stores.count()
+    store_count.short_description = 'Number of Liked Stores'
     
 @admin.register(Review)
-class LikeslistAdmin(admin.ModelAdmin):
+class ReviewAdmin(admin.ModelAdmin):
     def user_full_name(self, obj):
         return obj.user.full_name if obj.user else "No User"
     user_full_name.short_description = 'User Full Name' 
 
     list_display = ("user_full_name","store","rating")
     list_filter = ("user","store")
-    
 
+
+@admin.register(Order)
+class OrderAdmin(admin.ModelAdmin):
+    def user_full_name(self, obj):
+        return obj.user.full_name if obj.user else "No User"
+    user_full_name.short_description = 'User Full Name'
+
+    list_display = ("id", "user_full_name", "status", "payment_method", "date")
+    list_filter = ("status", "payment_method", "user")
+
+
+@admin.register(OrderItem)
+class OrderItemAdmin(admin.ModelAdmin):
+    def user_full_name(self, obj):
+        return obj.order.user.full_name if obj.order and obj.order.user else "No User"
+    user_full_name.short_description = 'User Full Name'
+
+    list_display = ("user_full_name", "product", "quantity", "price", "order")
+    list_filter = ("order__user", "product")
     

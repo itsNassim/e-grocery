@@ -20,6 +20,7 @@ class _PaymentPageState extends State<PaymentPage> {
   late VideoPlayerController _controller;
   bool _isPlaying = false;
   bool _isInitialized = false;
+  bool _hasPopped = false;
 
   @override
   void initState() {
@@ -30,8 +31,8 @@ class _PaymentPageState extends State<PaymentPage> {
   void _initializeVideoController() {
     _controller = VideoPlayerController.asset(
       _selectedMethod == "Delivery"
-          ? 'assets/videos/delivery.mp4'
-          : 'assets/videos/pickup.mp4',
+          ? 'assets/videos/delivery2.mp4'
+          : 'assets/videos/pickup2.webm',
     )..initialize().then((_) {
         setState(() {
           _isInitialized = true;
@@ -47,7 +48,12 @@ class _PaymentPageState extends State<PaymentPage> {
           _controller.seekTo(Duration.zero);
         });
         widget.function(_selectedMethod);
-        Navigator.pop(context);
+        Future.microtask(() {
+          if (Navigator.of(context).canPop() && !_hasPopped) {
+            Navigator.pop(context);
+            _hasPopped = true;
+          }
+        });
       }
     });
   }
@@ -116,57 +122,48 @@ class _PaymentPageState extends State<PaymentPage> {
                     _buildOptionCard("Pickup", Icons.store),
                   ],
                 ),
-                SizedBox(height: _isPlaying ? 40 : 100),
+                SizedBox(height: 100),
                 GestureDetector(
                   onTap: _handleTap,
-                  child: TweenAnimationBuilder<double>(
-                    duration: const Duration(milliseconds: 300),
-                    tween: Tween<double>(
-                        begin: _isPlaying ? 70 : 140,
-                        end: _isPlaying ? 140 : 70),
-                    builder: (context, size, child) {
-                      return Container(
-                        width: MediaQuery.of(context).size.width - 50,
-                        height: size,
-                        decoration: BoxDecoration(
-                          color: Color(0xff055A40),
-                          borderRadius: BorderRadius.circular(16),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
-                              blurRadius: 8,
-                              spreadRadius: 2,
-                            ),
-                          ],
+                  child: Container(
+                    width: MediaQuery.of(context).size.width - 50,
+                    height: 70,
+                    decoration: BoxDecoration(
+                      color: Color(0xff055A40),
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 8,
+                          spreadRadius: 2,
                         ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(16),
-                          child: _isPlaying
-                              ? _isInitialized
-                                  ? FittedBox(
-                                      fit: BoxFit.cover,
-                                      clipBehavior: Clip.hardEdge,
-                                      child: SizedBox(
-                                        width: _controller.value.size.width,
-                                        height: _controller.value.size.height,
-                                        child: VideoPlayer(_controller),
-                                      ),
-                                    )
-                                  : const Center(
-                                      child: CircularProgressIndicator())
-                              : Center(
-                                  child: Text(
-                                    'Confirm ${widget.total.toStringAsFixed(2)} DA',
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 22,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                      ],
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(16),
+                      child: _isPlaying
+                          ? _isInitialized
+                              ? FittedBox(
+                                  fit: BoxFit.fill,
+                                  clipBehavior: Clip.hardEdge,
+                                  child: SizedBox(
+                                    width: _controller.value.size.width,
+                                    height: _controller.value.size.height,
+                                    child: VideoPlayer(_controller),
                                   ),
+                                )
+                              : const Center(child: CircularProgressIndicator())
+                          : Center(
+                              child: Text(
+                                'Confirm ${widget.total.toStringAsFixed(2)} DA',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold,
                                 ),
-                        ),
-                      );
-                    },
+                              ),
+                            ),
+                    ),
                   ),
                 ),
               ],

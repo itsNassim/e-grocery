@@ -1,116 +1,156 @@
 import 'package:flutter/material.dart';
-import 'package:video_player/video_player.dart';
+import 'package:http/http.dart' as http;
+import 'package:user/backend/base.dart';
+import 'dart:convert';
+
+import 'package:user/classes/products_class.dart';
+import 'package:user/classes/shop_class.dart';
+
+// Replace with your actual backend URL
+const String backendUrl = '$baseUrl/search/';
 
 void main() {
   runApp(const MyApp());
 }
 
+// Root app widget
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
-
+  const MyApp({super.key});
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Video Button Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: const VideoButtonPage(),
+      title: 'Product & Store Search',
+      theme: ThemeData(primarySwatch: Colors.teal),
+      home: const SearchPage(),
       debugShowCheckedModeBanner: false,
     );
   }
 }
 
-class VideoButtonPage extends StatefulWidget {
-  const VideoButtonPage({Key? key}) : super(key: key);
+// Search Page
+class SearchPage extends StatefulWidget {
+  const SearchPage({super.key});
 
   @override
-  State<VideoButtonPage> createState() => _VideoButtonPageState();
+  State<SearchPage> createState() => _SearchPageState();
 }
 
-class _VideoButtonPageState extends State<VideoButtonPage> {
-  late VideoPlayerController _controller;
-  bool _isPlaying = false;
-  bool _isInitialized = false;
+class _SearchPageState extends State<SearchPage> {
+  final TextEditingController _controller = TextEditingController();
+  List<Product> _products = [];
+  List<ShopClass> _stores = [];
+  bool _isLoading = false;
 
-  @override
-  void initState() {
-    super.initState();
-    _controller = VideoPlayerController.asset(
-      'assets/videos/pickup.mp4',
-    )..initialize().then((_) {
-        setState(() {
-          _isInitialized = true;
-        });
-      });
+  void _performSearch(String query) async {
+    if (query.trim().isEmpty) return;
 
-    // Listen to video end
-    _controller.addListener(() {
-      if (_controller.value.position >= _controller.value.duration &&
-          _controller.value.isInitialized &&
-          !_controller.value.isPlaying) {
-        setState(() {
-          _isPlaying = false;
-          _controller.seekTo(Duration.zero); // Reset the video position
-        });
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  void _handleTap() {
-    if (_isInitialized) {
+    try {
+      final result = await searchProductsAndStores(query);
       setState(() {
-        _isPlaying = true;
-        _controller.play();
+        _products = result['products'];
+        _stores = result['stores'];
       });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: ${e.toString()}')),
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.blueGrey,
-      appBar: AppBar(title: const Text('Video Button Example')),
-      body: Center(
-        child: GestureDetector(
-          onTap: _handleTap,
-          child: Container(
-            width: MediaQuery.of(context).size.width - 50,
-            height: 120,
-            decoration: BoxDecoration(
-              color: Colors.blueAccent,
-              borderRadius: BorderRadius.circular(16),
+      appBar: AppBar(title: const Text('Search Products & Stores')),
+      body: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          children: [
+            TextField(
+              controller: _controller,
+              decoration: InputDecoration(
+                hintText: 'Search products or stores...',
+                suffixIcon: IconButton(
+                  icon: const Icon(Icons.search),
+                  onPressed: () => _performSearch(_controller.text),
+                ),
+              ),
+              onSubmitted: _performSearch,
             ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(16),
-              child: _isPlaying
-                  ? _isInitialized
-                      ? FittedBox(
+            const SizedBox(height: 20),
+            if (_isLoading)
+              const Center(child: CircularProgressIndicator())
+            else
+              Expanded(
+                child: ListView(
+                  children: [
+                    const Text('Products',
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 10),
+                    ..._products.map(
+                      (p) => ListTile(
+                        title: Text(p.name),
+                        subtitle: Text(p.shop.name),
+                        leading: Image.network(
+                          p.imageName,
+                          width: 50,
+                          height: 50,
                           fit: BoxFit.cover,
-                          clipBehavior: Clip.hardEdge,
-                          child: SizedBox(
-                            width: _controller.value.size.width,
-                            height: _controller.value.size.height,
-                            child: VideoPlayer(_controller),
-                          ),
-                        )
-                      : const Center(child: CircularProgressIndicator())
-                  : const Center(
-                      child: Text(
-                        'Tap to Play',
-                        style: TextStyle(color: Colors.white, fontSize: 18),
+                        ),
+                        trailing: Text('\$${p.price}'),
                       ),
                     ),
-            ),
-          ),
+                    const SizedBox(height: 16),
+                    const Text('Stores',
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 10),
+                    ..._stores.map(
+                      (s) => ListTile(
+                        title: Text(s.name),
+                        subtitle: Text(s.address),
+                        leading: Image.network(
+                          s.imageUrl,
+                          width: 50,
+                          height: 50,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+          ],
         ),
       ),
     );
+  }
+}
+
+// API call function
+Future<Map<String, dynamic>> searchProductsAndStores(String query) async {
+  final uri = Uri.parse('$backendUrl').replace(
+    queryParameters: {'q': query},
+  );
+
+  final response = await http.get(uri);
+
+  if (response.statusCode == 200) {
+    final data = jsonDecode(response.body);
+
+    final products = (data['products'] as List)
+        .map((json) => Product.fromJson(json))
+        .toList();
+
+    final stores = (data['stores'] as List)
+        .map((json) => ShopClass.fromJson(json))
+        .toList();
+
+    return {
+      'products': products,
+      'stores': stores,
+    };
+  } else {
+    throw Exception('Search failed: ${response.statusCode}');
   }
 }

@@ -38,7 +38,7 @@ class AboutUsPage extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "Welcome to FreshCart!",
+                          "Welcome to Freshly!",
                           style: TextStyle(
                             fontSize: 26,
                             fontWeight: FontWeight.bold,
@@ -47,7 +47,7 @@ class AboutUsPage extends StatelessWidget {
                         ),
                         const SizedBox(height: 15),
                         Text(
-                          "At FreshCart, we bring your favorite grocery shops directly to your fingertips. Our mission is to make grocery shopping faster, fresher, and easier than ever before.",
+                          "At Freshly, we bring your favorite grocery shops directly to your fingertips. Our mission is to make grocery shopping faster, fresher, and easier than ever before.",
                           style: TextStyle(
                             fontSize: 16,
                             color: Colors.grey[700],
@@ -94,7 +94,7 @@ class AboutUsPage extends StatelessWidget {
                         const SizedBox(height: 30),
                         Center(
                           child: Text(
-                            "Thank you for choosing FreshCart!",
+                            "Thank you for choosing Freshly!",
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.w600,

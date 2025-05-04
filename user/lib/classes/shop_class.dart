@@ -53,6 +53,15 @@ class ShopClass {
       //'owner': owner?.toJson(), // Convert owner to JSON if it's not null
     };
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is ShopClass && other.id == id;
+  }
+
+  @override
+  int get hashCode => id.hashCode;
 }
 
 /*List<ShopClass> globalShopsList = [

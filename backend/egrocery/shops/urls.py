@@ -38,8 +38,13 @@ urlpatterns = [
     path('stores/<int:store_id>/reviews/add/', ReviewCreateView.as_view(), name='add-review'),
     path('stores/<int:store_id>/reviews/<int:review_id>/delete/', ReviewDeleteView.as_view(), name='delete-review'),
     #-------------<Order>---------- 
+    path('orders/', UserOrdersView.as_view(), name='user-orders'),
     path('orders/create/', CreateOrderView.as_view(), name='create-order'),
     path('orders/<int:pk>/update-status/', UpdateOrderStatusView.as_view(), name='update-order-status'),
+    #-------------<Product Filter>---------- 
+    path('products/filter/', ProductFilterView.as_view(), name='product-list'),
+    #-------------<Search>---------- 
+    path('search/', search_view, name='search'),
 
 
 ]

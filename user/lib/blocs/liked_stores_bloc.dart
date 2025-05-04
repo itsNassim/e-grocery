@@ -75,12 +75,8 @@ class LikedStoresBloc extends Bloc<LikedStoresEvent, LikedStoresState> {
     Emitter<LikedStoresState> emit,
   ) async {
     try {
-      await removeStoreFromLiked(
-          event.store.id); // Remove store from liked list
-      final updatedStores = state.shopsList
-          .where((store) => store.id != event.store.id)
-          .toList(); // Remove the store from the list
-      emit(state.copyWith(shopsList: updatedStores));
+      await removeStoreFromLiked(event.store.id);
+      add(FetchLikedStoresEvent());
     } catch (e) {
       emit(state);
     }
