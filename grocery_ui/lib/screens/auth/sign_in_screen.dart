@@ -400,7 +400,7 @@ class _SignInScreenState extends State<SignInScreen> {
                   child: OutlinedButton.icon(
                     onPressed: _isLoading ? null : _signInWithGoogle,
                     icon: Image.asset(
-                      'assets/images/google_logo.png',
+                      'grocery_ui/assets/images/google_logo.png',
                       height: 24,
                     ),
                     label: Text(

@@ -388,6 +388,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       children: [
                         Container(
                           height: 180 * heightPercentage,
+                          
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
                               begin: Alignment.bottomCenter,
@@ -397,6 +398,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             borderRadius: BorderRadius.circular(8),
                           ),
                         ),
+                        
                         const SizedBox(height: 8),
                         Text(
                           day['day'] as String,
@@ -404,7 +406,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             color: isDarkMode ? Colors.white70 : Colors.black54,
                             fontSize: 12,
                           ),
+                          overflow: TextOverflow.ellipsis,
                         ),
+                        
                         const SizedBox(height: 4),
                         Text(
                           '\$${(day['amount'] as double).toStringAsFixed(0)}',
@@ -413,6 +417,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             fontSize: 10,
                             fontWeight: FontWeight.bold,
                           ),
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ],
                     ),
