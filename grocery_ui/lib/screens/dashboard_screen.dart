@@ -33,6 +33,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final size = MediaQuery.of(context).size;
     final isTablet = size.width > 600;
 
+    // Define theme colors
+    final primaryGreen = Color(0xFF2E7D32);
+    final secondaryPurple = Color(0xFF6A1B9A);
+    final lightGreen = Color(0xFF4CAF50);
+    final lightPurple = Color(0xFF9C27B0);
+    final bgColor = isDarkMode ? Color(0xFF0A1F0A) : Colors.white;
+    final cardColor = isDarkMode ? Color(0xFF1A2F1A) : Colors.white;
+
     return Scaffold(
       body: Row(
         children: [
@@ -53,40 +61,132 @@ class _DashboardScreenState extends State<DashboardScreen> {
             },
           ),
           Expanded(
-            child: SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildHeader(context),
-                    const SizedBox(height: 24),
-                    _buildMonthlyOverview(context),
-                    const SizedBox(height: 24),
-                    _buildMonthlySalesChart(context),
-                    const SizedBox(height: 24),
-                    if (isTablet)
+            child: Container(
+              color: bgColor,
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // App Logo and Header
                       Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Expanded(child: _buildTopSellingProducts(context)),
-                          const SizedBox(width: 16),
-                          Expanded(child: _buildCustomerGrowth(context)),
-                        ],
-                      )
-                    else
-                      Column(
-                        children: [
-                          _buildTopSellingProducts(context),
-                          const SizedBox(height: 24),
-                          _buildCustomerGrowth(context),
+                          Row(
+                            children: [
+                              Container(
+                                width: 50,
+                                height: 50,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  gradient: LinearGradient(
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                    colors: [primaryGreen, secondaryPurple],
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: primaryGreen.withOpacity(0.3),
+                                      blurRadius: 10,
+                                      offset: Offset(0, 4),
+                                    ),
+                                  ],
+                                ),
+                                child: Center(
+                                  child: Image.asset(
+                                    'assets/images/app_logo.png',
+                                    width: 30,
+                                    height: 30,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                              SizedBox(width: 16),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Monthly Statistics',
+                                    style: TextStyle(
+                                      fontSize: 28,
+                                      fontWeight: FontWeight.bold,
+                                      color: primaryGreen,
+                                    ),
+                                  ),
+                                  SizedBox(height: 8),
+                                  Text(
+                                    'Overview of your shop\'s performance for the selected month',
+                                    style: TextStyle(
+                                      color: isDarkMode ? Colors.white70 : Colors.black54,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                          Container(
+                            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: primaryGreen.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(color: primaryGreen.withOpacity(0.3)),
+                            ),
+                            child: DropdownButton<String>(
+                              value: _selectedMonth,
+                              items: _availableMonths.map((String value) {
+                                return DropdownMenuItem<String>(
+                                  value: value,
+                                  child: Text(value),
+                                );
+                              }).toList(),
+                              onChanged: (String? newValue) {
+                                if (newValue != null) {
+                                  setState(() {
+                                    _selectedMonth = newValue;
+                                  });
+                                }
+                              },
+                              style: TextStyle(
+                                color: isDarkMode ? Colors.white : Colors.black,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                              ),
+                              icon: Icon(Icons.keyboard_arrow_down, color: primaryGreen),
+                              underline: Container(),
+                              dropdownColor: isDarkMode ? Color(0xFF1A2F1A) : Colors.white,
+                            ),
+                          ),
                         ],
                       ),
-                    const SizedBox(height: 24),
-                    _buildCategorySales(context),
-                    const SizedBox(height: 24),
-                    _buildMonthlyOrderStatus(context),
-                  ],
+                      const SizedBox(height: 24),
+                      _buildMonthlyOverview(context, primaryGreen, secondaryPurple, cardColor, isDarkMode),
+                      const SizedBox(height: 24),
+                      _buildMonthlySalesChart(context, primaryGreen, cardColor, isDarkMode),
+                      const SizedBox(height: 24),
+                      if (isTablet)
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(child: _buildTopSellingProducts(context, primaryGreen, secondaryPurple, cardColor, isDarkMode)),
+                            const SizedBox(width: 16),
+                            Expanded(child: _buildCustomerGrowth(context, secondaryPurple, cardColor, isDarkMode)),
+                          ],
+                        )
+                      else
+                        Column(
+                          children: [
+                            _buildTopSellingProducts(context, primaryGreen, secondaryPurple, cardColor, isDarkMode),
+                            const SizedBox(height: 24),
+                            _buildCustomerGrowth(context, secondaryPurple, cardColor, isDarkMode),
+                          ],
+                        ),
+                      const SizedBox(height: 24),
+                      _buildCategorySales(context, primaryGreen, secondaryPurple, cardColor, isDarkMode),
+                      const SizedBox(height: 24),
+                      _buildMonthlyOrderStatus(context, primaryGreen, secondaryPurple, cardColor, isDarkMode),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -96,63 +196,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  Widget _buildHeader(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Monthly Statistics',
-              style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Overview of your shop\'s performance for the selected month',
-              style: TextStyle(
-                color: isDarkMode ? Colors.white70 : Colors.black54,
-              ),
-            ),
-          ],
-        ),
-        DropdownButton<String>(
-          value: _selectedMonth,
-          items: _availableMonths.map((String value) {
-            return DropdownMenuItem<String>(
-              value: value,
-              child: Text(value),
-            );
-          }).toList(),
-          onChanged: (String? newValue) {
-            if (newValue != null) {
-              setState(() {
-                _selectedMonth = newValue;
-              });
-            }
-          },
-          style: TextStyle(
-            color: isDarkMode ? Colors.white : Colors.black,
-            fontSize: 16,
-          ),
-          icon: const Icon(Icons.keyboard_arrow_down),
-          underline: Container(
-            height: 2,
-            color: Theme.of(context).primaryColor,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildMonthlyOverview(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    
+  Widget _buildMonthlyOverview(BuildContext context, Color primaryGreen, Color secondaryPurple, Color cardColor, bool isDarkMode) {
     // Mock data for monthly statistics
     final stats = {
       'Total Revenue': '\$28,450.75',
@@ -176,10 +220,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
     };
     
     final colors = {
-      'Total Revenue': Colors.green,
-      'Orders': Colors.blue,
-      'Average Order': Colors.orange,
-      'New Customers': Colors.purple,
+      'Total Revenue': primaryGreen,
+      'Orders': secondaryPurple,
+      'Average Order': Color(0xFFFF9800), // Orange
+      'New Customers': Color(0xFF9C27B0), // Purple
     };
     
     return GridView.count(
@@ -192,15 +236,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
         return Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: isDarkMode ? const Color(0xFF1A1F38) : Colors.white,
-            borderRadius: BorderRadius.circular(12),
+            color: cardColor,
+            borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.05),
+                color: colors[key]!.withOpacity(0.1),
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               ),
             ],
+            border: Border.all(
+              color: colors[key]!.withOpacity(0.2),
+              width: 1,
+            ),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -209,10 +257,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(8),
+                    padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
                       color: colors[key]!.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(12),
                     ),
                     child: Icon(
                       icons[key],
@@ -220,31 +268,42 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       size: 24,
                     ),
                   ),
-                  Row(
-                    children: [
-                      Icon(
-                        comparisonToPrevMonth[key]! >= 0 ? Icons.arrow_upward : Icons.arrow_downward,
-                        color: comparisonToPrevMonth[key]! >= 0 ? Colors.green : Colors.red,
-                        size: 16,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        '${comparisonToPrevMonth[key]!.abs().toStringAsFixed(1)}%',
-                        style: TextStyle(
-                          color: comparisonToPrevMonth[key]! >= 0 ? Colors.green : Colors.red,
-                          fontWeight: FontWeight.bold,
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: comparisonToPrevMonth[key]! >= 0 
+                          ? primaryGreen.withOpacity(0.1) 
+                          : Colors.red.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          comparisonToPrevMonth[key]! >= 0 ? Icons.arrow_upward : Icons.arrow_downward,
+                          color: comparisonToPrevMonth[key]! >= 0 ? primaryGreen : Colors.red,
+                          size: 14,
                         ),
-                      ),
-                    ],
+                        const SizedBox(width: 4),
+                        Text(
+                          '${comparisonToPrevMonth[key]!.abs().toStringAsFixed(1)}%',
+                          style: TextStyle(
+                            color: comparisonToPrevMonth[key]! >= 0 ? primaryGreen : Colors.red,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
               const Spacer(),
               Text(
                 stats[key]!,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
+                  color: colors[key],
                 ),
               ),
               const SizedBox(height: 4),
@@ -261,9 +320,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  Widget _buildMonthlySalesChart(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    
+  Widget _buildMonthlySalesChart(BuildContext context, Color primaryGreen, Color cardColor, bool isDarkMode) {
     // Mock data for daily sales within the month
     final List<Map<String, dynamic>> dailySales = [
       {'day': '1', 'amount': 850.0},
@@ -280,26 +337,31 @@ class _DashboardScreenState extends State<DashboardScreen> {
     
     return Container(
       height: 300,
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: isDarkMode ? const Color(0xFF1A1F38) : Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        color: cardColor,
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: primaryGreen.withOpacity(0.1),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
         ],
+        border: Border.all(
+          color: primaryGreen.withOpacity(0.2),
+          width: 1,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Monthly Sales Trend',
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
+              color: primaryGreen,
             ),
           ),
           const SizedBox(height: 8),
@@ -327,8 +389,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         Container(
                           height: 180 * heightPercentage,
                           decoration: BoxDecoration(
-                            color: Theme.of(context).primaryColor,
-                            borderRadius: BorderRadius.circular(4),
+                            gradient: LinearGradient(
+                              begin: Alignment.bottomCenter,
+                              end: Alignment.topCenter,
+                              colors: [primaryGreen, primaryGreen.withOpacity(0.7)],
+                            ),
+                            borderRadius: BorderRadius.circular(8),
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -343,7 +409,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         Text(
                           '\$${(day['amount'] as double).toStringAsFixed(0)}',
                           style: TextStyle(
-                            color: isDarkMode ? Colors.white : Colors.black,
+                            color: primaryGreen,
                             fontSize: 10,
                             fontWeight: FontWeight.bold,
                           ),
@@ -360,9 +426,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  Widget _buildTopSellingProducts(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    
+  Widget _buildTopSellingProducts(BuildContext context, Color primaryGreen, Color secondaryPurple, Color cardColor, bool isDarkMode) {
     // Mock data for top products in the month
     final List<Map<String, dynamic>> topProducts = [
       {
@@ -398,26 +462,31 @@ class _DashboardScreenState extends State<DashboardScreen> {
     ];
     
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: isDarkMode ? const Color(0xFF1A1F38) : Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        color: cardColor,
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: primaryGreen.withOpacity(0.1),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
         ],
+        border: Border.all(
+          color: primaryGreen.withOpacity(0.2),
+          width: 1,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Top Selling Products',
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
+              color: primaryGreen,
             ),
           ),
           const SizedBox(height: 8),
@@ -435,11 +504,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
               child: Row(
                 children: [
                   ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(10),
                     child: Image.asset(
                       product['image'] as String,
-                      width: 40,
-                      height: 40,
+                      width: 50,
+                      height: 50,
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -450,8 +519,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       children: [
                         Text(
                           product['name'] as String,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w500,
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            color: isDarkMode ? Colors.white : Colors.black87,
                           ),
                         ),
                         const SizedBox(height: 4),
@@ -467,8 +537,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
                   Text(
                     product['revenue'] as String,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontWeight: FontWeight.bold,
+                      color: primaryGreen,
                     ),
                   ),
                 ],
@@ -480,9 +551,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  Widget _buildCustomerGrowth(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    
+  Widget _buildCustomerGrowth(BuildContext context, Color secondaryPurple, Color cardColor, bool isDarkMode) {
     // Mock data for weekly customer acquisition within the month
     final List<Map<String, dynamic>> weeklyCustomers = [
       {'week': 'Week 1', 'customers': 32},
@@ -492,26 +561,31 @@ class _DashboardScreenState extends State<DashboardScreen> {
     ];
     
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: isDarkMode ? const Color(0xFF1A1F38) : Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        color: cardColor,
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: secondaryPurple.withOpacity(0.1),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
         ],
+        border: Border.all(
+          color: secondaryPurple.withOpacity(0.2),
+          width: 1,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'New Customers',
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
+              color: secondaryPurple,
             ),
           ),
           const SizedBox(height: 8),
@@ -534,14 +608,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     children: [
                       Text(
                         week['week'] as String,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontWeight: FontWeight.w500,
+                          color: isDarkMode ? Colors.white : Colors.black87,
                         ),
                       ),
                       Text(
                         '${week['customers']} customers',
                         style: TextStyle(
-                          color: Colors.blue,
+                          color: secondaryPurple,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -549,11 +624,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
                   const SizedBox(height: 8),
                   ClipRRect(
-                    borderRadius: BorderRadius.circular(4),
+                    borderRadius: BorderRadius.circular(6),
                     child: LinearProgressIndicator(
                       value: (week['customers'] as int) / 40, // Assuming 40 is the target
                       backgroundColor: isDarkMode ? Colors.white10 : Colors.black.withOpacity(0.05),
-                      valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
+                      valueColor: AlwaysStoppedAnimation<Color>(secondaryPurple),
                       minHeight: 8,
                     ),
                   ),
@@ -566,23 +641,27 @@ class _DashboardScreenState extends State<DashboardScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                 decoration: BoxDecoration(
-                  color: Colors.blue.withOpacity(0.1),
+                  color: secondaryPurple.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: secondaryPurple.withOpacity(0.3),
+                    width: 1,
+                  ),
                 ),
                 child: Row(
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.people,
-                      color: Colors.blue,
+                      color: secondaryPurple,
                       size: 20,
                     ),
                     const SizedBox(width: 8),
                     Text(
                       'Total: 124 new customers',
-                      style: const TextStyle(
-                        color: Colors.blue,
+                      style: TextStyle(
+                        color: secondaryPurple,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -596,39 +675,42 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  Widget _buildCategorySales(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    
+  Widget _buildCategorySales(BuildContext context, Color primaryGreen, Color secondaryPurple, Color cardColor, bool isDarkMode) {
     // Mock data for category sales in the month
     final List<Map<String, dynamic>> categorySales = [
-      {'category': 'Fruits & Vegetables', 'percentage': 35, 'color': Colors.blue},
-      {'category': 'Dairy & Eggs', 'percentage': 25, 'color': Colors.green},
-      {'category': 'Meat & Seafood', 'percentage': 20, 'color': Colors.orange},
-      {'category': 'Bakery', 'percentage': 12, 'color': Colors.purple},
-      {'category': 'Beverages', 'percentage': 8, 'color': Colors.red},
+      {'category': 'Fruits & Vegetables', 'percentage': 35, 'color': primaryGreen},
+      {'category': 'Dairy & Eggs', 'percentage': 25, 'color': secondaryPurple},
+      {'category': 'Meat & Seafood', 'percentage': 20, 'color': Color(0xFFFF9800)},
+      {'category': 'Bakery', 'percentage': 12, 'color': Color(0xFF9C27B0)},
+      {'category': 'Beverages', 'percentage': 8, 'color': Color(0xFFF44336)},
     ];
     
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: isDarkMode ? const Color(0xFF1A1F38) : Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        color: cardColor,
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: primaryGreen.withOpacity(0.1),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
         ],
+        border: Border.all(
+          color: primaryGreen.withOpacity(0.2),
+          width: 1,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Sales by Category',
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
+              color: primaryGreen,
             ),
           ),
           const SizedBox(height: 8),
@@ -643,13 +725,24 @@ class _DashboardScreenState extends State<DashboardScreen> {
           Row(
             children: [
               // Pie chart representation
-              SizedBox(
-                width: 120,
-                height: 120,
+              Container(
+                width: 140,
+                height: 140,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: primaryGreen.withOpacity(0.1),
+                      blurRadius: 10,
+                      spreadRadius: 5,
+                    ),
+                  ],
+                ),
                 child: CustomPaint(
                   painter: PieChartPainter(
                     data: categorySales.map((e) => e['percentage'] as int).toList(),
                     colors: categorySales.map((e) => e['color'] as Color).toList(),
+                    isDarkMode: isDarkMode,
                   ),
                 ),
               ),
@@ -659,7 +752,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 child: Column(
                   children: categorySales.map((category) {
                     return Padding(
-                      padding: const EdgeInsets.only(bottom: 8),
+                      padding: const EdgeInsets.only(bottom: 10),
                       child: Row(
                         children: [
                           Container(
@@ -668,22 +761,42 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             decoration: BoxDecoration(
                               color: category['color'] as Color,
                               shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: (category['color'] as Color).withOpacity(0.3),
+                                  blurRadius: 4,
+                                  offset: Offset(0, 2),
+                                ),
+                              ],
                             ),
                           ),
-                          const SizedBox(width: 8),
+                          const SizedBox(width: 12),
                           Expanded(
                             child: Text(
                               category['category'] as String,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontWeight: FontWeight.w500,
+                                color: isDarkMode ? Colors.white : Colors.black87,
                               ),
                             ),
                           ),
-                          Text(
-                            '${category['percentage']}%',
-                            style: TextStyle(
-                              color: category['color'] as Color,
-                              fontWeight: FontWeight.bold,
+                          Container(
+                            padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: (category['color'] as Color).withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(
+                                color: (category['color'] as Color).withOpacity(0.3),
+                                width: 1,
+                              ),
+                            ),
+                            child: Text(
+                              '${category['percentage']}%',
+                              style: TextStyle(
+                                color: category['color'] as Color,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 13,
+                              ),
                             ),
                           ),
                         ],
@@ -699,49 +812,52 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  Widget _buildMonthlyOrderStatus(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    
+  Widget _buildMonthlyOrderStatus(BuildContext context, Color primaryGreen, Color secondaryPurple, Color cardColor, bool isDarkMode) {
     // Mock data for order status in the month
     final Map<String, Map<String, dynamic>> orderStatus = {
       'Delivered': {
         'count': 385,
         'percentage': 79,
-        'color': Colors.green,
+        'color': primaryGreen,
       },
       'Processing': {
         'count': 68,
         'percentage': 14,
-        'color': Colors.blue,
+        'color': secondaryPurple,
       },
       'Pending': {
         'count': 34,
         'percentage': 7,
-        'color': Colors.orange,
+        'color': Color(0xFFFF9800),
       },
     };
     
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: isDarkMode ? const Color(0xFF1A1F38) : Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        color: cardColor,
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: primaryGreen.withOpacity(0.1),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
         ],
+        border: Border.all(
+          color: primaryGreen.withOpacity(0.2),
+          width: 1,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Order Status',
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
+              color: primaryGreen,
             ),
           ),
           const SizedBox(height: 8),
@@ -762,11 +878,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     alignment: Alignment.center,
                     children: [
                       SizedBox(
-                        width: 80,
-                        height: 80,
+                        width: 90,
+                        height: 90,
                         child: CircularProgressIndicator(
                           value: (entry.value['percentage'] as int) / 100,
-                          strokeWidth: 8,
+                          strokeWidth: 10,
                           backgroundColor: isDarkMode ? Colors.white10 : Colors.black.withOpacity(0.05),
                           valueColor: AlwaysStoppedAnimation<Color>(entry.value['color'] as Color),
                         ),
@@ -777,7 +893,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             '${entry.value['percentage']}%',
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
-                              fontSize: 16,
+                              fontSize: 18,
                               color: entry.value['color'] as Color,
                             ),
                           ),
@@ -792,11 +908,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 16),
                   Text(
                     entry.key,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontWeight: FontWeight.w500,
+                      color: entry.value['color'] as Color,
                     ),
                   ),
                 ],
@@ -807,19 +924,24 @@ class _DashboardScreenState extends State<DashboardScreen> {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: isDarkMode ? Colors.white10 : Colors.black.withOpacity(0.05),
-              borderRadius: BorderRadius.circular(8),
+              color: primaryGreen.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: primaryGreen.withOpacity(0.3),
+                width: 1,
+              ),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.shopping_cart),
+                Icon(Icons.shopping_cart, color: primaryGreen),
                 const SizedBox(width: 8),
                 Text(
                   'Total Orders: 487',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
+                    color: primaryGreen,
                   ),
                 ),
               ],
@@ -835,10 +957,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
 class PieChartPainter extends CustomPainter {
   final List<int> data;
   final List<Color> colors;
+  final bool isDarkMode;
 
   PieChartPainter({
     required this.data,
     required this.colors,
+    required this.isDarkMode,
   });
 
   @override
@@ -869,7 +993,7 @@ class PieChartPainter extends CustomPainter {
     
     // Draw a white circle in the center for a donut chart effect
     final centerPaint = Paint()
-      ..color = Colors.white
+      ..color = isDarkMode ? Color(0xFF1A2F1A) : Colors.white
       ..style = PaintingStyle.fill;
     
     canvas.drawCircle(center, radius * 0.6, centerPaint);

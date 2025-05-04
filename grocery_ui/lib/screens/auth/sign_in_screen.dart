@@ -22,6 +22,12 @@ class _SignInScreenState extends State<SignInScreen> {
   bool _isLoading = false;
   String? _errorMessage;
 
+  // Green theme colors
+  final Color primaryGreen = const Color(0xFF2E7D32);
+  final Color lightGreen = const Color(0xFF4CAF50);
+  final Color darkGreen = const Color(0xFF1B5E20);
+  final Color accentGreen = const Color(0xFF8BC34A);
+
   @override
   void dispose() {
     _emailController.dispose();
@@ -105,31 +111,46 @@ class _SignInScreenState extends State<SignInScreen> {
             width: size.width > 800 ? 400 : size.width * 0.9,
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: isDarkMode ? const Color(0xFF1A1F38) : Colors.white,
-              borderRadius: BorderRadius.circular(12),
+              color: isDarkMode ? const Color(0xFF0A1F0A) : Colors.white,
+              borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
+                  color: primaryGreen.withOpacity(0.2),
                   blurRadius: 20,
                   offset: const Offset(0, 10),
                 ),
               ],
+              border: Border.all(
+                color: accentGreen.withOpacity(0.2),
+                width: 1,
+              ),
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 // Logo
-                Image.asset(
-                  'assets/images/logo.png',
-                  height: 100,
-                ),
-                const SizedBox(height: 24),
+                Container(
+  width: 100,
+  height: 100,
+  padding: const EdgeInsets.all(8),
+  decoration: BoxDecoration(
+    color: primaryGreen.withOpacity(0.1),
+    shape: BoxShape.circle,
+  ),
+  child: ClipOval(
+    child: Image.asset(
+      'assets/images/app_logo.png',
+      fit: BoxFit.contain,
+    ),
+  ),
+),
                 // Title
-                const Text(
+                Text(
                   'Welcome Back',
                   style: TextStyle(
-                    fontSize: 24,
+                    fontSize: 28,
                     fontWeight: FontWeight.bold,
+                    color: isDarkMode ? Colors.white : darkGreen,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -146,7 +167,10 @@ class _SignInScreenState extends State<SignInScreen> {
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
                       color: Colors.red.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: Colors.red.withOpacity(0.3),
+                      ),
                     ),
                     child: Row(
                       children: [
@@ -173,10 +197,11 @@ class _SignInScreenState extends State<SignInScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
+                      Text(
                         'Email',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
+                          color: isDarkMode ? Colors.white : darkGreen,
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -185,14 +210,22 @@ class _SignInScreenState extends State<SignInScreen> {
                         keyboardType: TextInputType.emailAddress,
                         decoration: InputDecoration(
                           hintText: 'Enter your email',
-                          prefixIcon: const Icon(Icons.email),
+                          prefixIcon: Icon(Icons.email, color: primaryGreen),
                           filled: true,
                           fillColor: isDarkMode
-                              ? const Color(0xFF0A0E21)
-                              : Colors.grey.shade100,
+                              ? const Color(0xFF0A1F0A)
+                              : accentGreen.withOpacity(0.05),
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
+                            borderRadius: BorderRadius.circular(12),
                             borderSide: BorderSide.none,
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(color: primaryGreen, width: 2),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(color: accentGreen.withOpacity(0.3)),
                           ),
                         ),
                         validator: (value) {
@@ -206,10 +239,11 @@ class _SignInScreenState extends State<SignInScreen> {
                         },
                       ),
                       const SizedBox(height: 16),
-                      const Text(
+                      Text(
                         'Password',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
+                          color: isDarkMode ? Colors.white : darkGreen,
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -218,12 +252,13 @@ class _SignInScreenState extends State<SignInScreen> {
                         obscureText: _obscurePassword,
                         decoration: InputDecoration(
                           hintText: 'Enter your password',
-                          prefixIcon: const Icon(Icons.lock),
+                          prefixIcon: Icon(Icons.lock, color: primaryGreen),
                           suffixIcon: IconButton(
                             icon: Icon(
                               _obscurePassword
                                   ? Icons.visibility_off
                                   : Icons.visibility,
+                              color: primaryGreen,
                             ),
                             onPressed: () {
                               setState(() {
@@ -233,11 +268,19 @@ class _SignInScreenState extends State<SignInScreen> {
                           ),
                           filled: true,
                           fillColor: isDarkMode
-                              ? const Color(0xFF0A0E21)
-                              : Colors.grey.shade100,
+                              ? const Color(0xFF0A1F0A)
+                              : accentGreen.withOpacity(0.05),
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
+                            borderRadius: BorderRadius.circular(12),
                             borderSide: BorderSide.none,
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(color: primaryGreen, width: 2),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(color: accentGreen.withOpacity(0.3)),
                           ),
                         ),
                         validator: (value) {
@@ -253,15 +296,27 @@ class _SignInScreenState extends State<SignInScreen> {
                         children: [
                           Row(
                             children: [
-                              Checkbox(
-                                value: _rememberMe,
-                                onChanged: (value) {
-                                  setState(() {
-                                    _rememberMe = value ?? false;
-                                  });
-                                },
+                              Transform.scale(
+                                scale: 0.9,
+                                child: Checkbox(
+                                  value: _rememberMe,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      _rememberMe = value ?? false;
+                                    });
+                                  },
+                                  activeColor: primaryGreen,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                ),
                               ),
-                              const Text('Remember me'),
+                              Text(
+                                'Remember me',
+                                style: TextStyle(
+                                  color: isDarkMode ? Colors.white70 : Colors.black54,
+                                ),
+                              ),
                             ],
                           ),
                           TextButton(
@@ -270,6 +325,9 @@ class _SignInScreenState extends State<SignInScreen> {
                                 ForgotPasswordScreen.routeName,
                               );
                             },
+                            style: TextButton.styleFrom(
+                              foregroundColor: primaryGreen,
+                            ),
                             child: const Text('Forgot Password?'),
                           ),
                         ],
@@ -281,14 +339,15 @@ class _SignInScreenState extends State<SignInScreen> {
                         child: ElevatedButton(
                           onPressed: _isLoading ? null : _signIn,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blue,
+                            backgroundColor: primaryGreen,
                             foregroundColor: Colors.white,
+                            elevation: 2,
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
+                              borderRadius: BorderRadius.circular(12),
                             ),
                           ),
                           child: _isLoading
-                              ? const SizedBox(
+                              ? SizedBox(
                                   width: 24,
                                   height: 24,
                                   child: CircularProgressIndicator(
@@ -344,13 +403,18 @@ class _SignInScreenState extends State<SignInScreen> {
                       'assets/images/google_logo.png',
                       height: 24,
                     ),
-                    label: const Text('Sign in with Google'),
+                    label: Text(
+                      'Sign in with Google',
+                      style: TextStyle(
+                        color: isDarkMode ? Colors.white : darkGreen,
+                      ),
+                    ),
                     style: OutlinedButton.styleFrom(
                       side: BorderSide(
-                        color: isDarkMode ? Colors.white30 : Colors.black26,
+                        color: accentGreen,
                       ),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(12),
                       ),
                     ),
                   ),
@@ -372,6 +436,9 @@ class _SignInScreenState extends State<SignInScreen> {
                           SignUpScreen.routeName,
                         );
                       },
+                      style: TextButton.styleFrom(
+                        foregroundColor: primaryGreen,
+                      ),
                       child: const Text('Sign Up'),
                     ),
                   ],

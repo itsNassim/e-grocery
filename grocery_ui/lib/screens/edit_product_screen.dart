@@ -199,6 +199,14 @@ class _EditProductScreenState extends State<EditProductScreen> {
     final size = MediaQuery.of(context).size;
     final isTablet = size.width > 600;
     
+    // Define theme colors
+    final primaryGreen = const Color(0xFF2E7D32);
+    final secondaryPurple = const Color(0xFF6A1B9A);
+    final lightGreen = const Color(0xFF4CAF50);
+    final lightPurple = const Color(0xFF9C27B0);
+    final bgColor = isDarkMode ? const Color(0xFF0A1F0A) : Colors.white;
+    final cardColor = isDarkMode ? const Color(0xFF1A2F1A) : Colors.white;
+    
     return Scaffold(
       body: Row(
         children: [
@@ -217,138 +225,214 @@ class _EditProductScreenState extends State<EditProductScreen> {
             },
           ),
           Expanded(
-            child: _isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : SingleChildScrollView(
-                    child: Padding(
-                      padding: const EdgeInsets.all(24.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Header
-                          Row(
-                            children: [
-                              IconButton(
-                                icon: const Icon(Icons.arrow_back),
-                                onPressed: () {
-                                  productProvider.clearSelectedProduct();
-                                  Navigator.of(context).pop();
-                                },
-                              ),
-                              const SizedBox(width: 16),
-                              Text(
-                                selectedProduct == null ? 'Add New Product' : 'Edit Product',
-                                style: const TextStyle(
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.bold,
+            child: Container(
+              color: bgColor,
+              child: _isLoading
+                  ? Center(
+                      child: CircularProgressIndicator(
+                        color: primaryGreen,
+                      ),
+                    )
+                  : SingleChildScrollView(
+                      child: Padding(
+                        padding: const EdgeInsets.all(24.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Header
+                            Container(
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: cardColor,
+                                borderRadius: BorderRadius.circular(12),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: primaryGreen.withOpacity(0.1),
+                                    blurRadius: 10,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
+                                border: Border.all(
+                                  color: primaryGreen.withOpacity(0.1),
+                                  width: 1,
                                 ),
                               ),
-                            ],
-                          ),
-                          const SizedBox(height: 24),
-                          // Form
-                          Form(
-                            key: _formKey,
-                            child: isTablet
-                                ? Row(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      // Left column - Image and category
-                                      Expanded(
-                                        flex: 1,
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            _buildImageSection(isDarkMode),
-                                            const SizedBox(height: 24),
-                                            _buildCategorySection(isDarkMode),
-                                          ],
+                              child: Row(
+                                children: [
+                                  // Logo
+                                  Container(
+                                    width: 40,
+                                    height: 40,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      gradient: LinearGradient(
+                                        begin: Alignment.topLeft,
+                                        end: Alignment.bottomRight,
+                                        colors: [primaryGreen, secondaryPurple],
+                                      ),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: primaryGreen.withOpacity(0.3),
+                                          blurRadius: 8,
+                                          offset: const Offset(0, 2),
                                         ),
+                                      ],
+                                    ),
+                                    child: Center(
+                                      child: Image.asset(
+                                        'assets/images/logo.png',
+                                        width: 24,
+                                        height: 24,
+                                        color: Colors.white,
                                       ),
-                                      const SizedBox(width: 24),
-                                      // Right column - Product details
-                                      Expanded(
-                                        flex: 2,
-                                        child: _buildProductDetailsSection(isDarkMode),
-                                      ),
-                                    ],
-                                  )
-                                : Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      _buildImageSection(isDarkMode),
-                                      const SizedBox(height: 24),
-                                      _buildCategorySection(isDarkMode),
-                                      const SizedBox(height: 24),
-                                      _buildProductDetailsSection(isDarkMode),
-                                    ],
+                                    ),
                                   ),
-                          ),
-                          const SizedBox(height: 32),
-                          // Action Buttons
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              OutlinedButton(
-                                onPressed: () {
-                                  productProvider.clearSelectedProduct();
-                                  Navigator.of(context).pop();
-                                },
-                                style: OutlinedButton.styleFrom(
-                                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
+                                  const SizedBox(width: 16),
+                                  IconButton(
+                                    icon: const Icon(Icons.arrow_back),
+                                    onPressed: () {
+                                      productProvider.clearSelectedProduct();
+                                      Navigator.of(context).pop();
+                                    },
+                                    color: primaryGreen,
+                                  ),
+                                  const SizedBox(width: 16),
+                                  Text(
+                                    selectedProduct == null ? 'Add New Product' : 'Edit Product',
+                                    style: TextStyle(
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.bold,
+                                      color: primaryGreen,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 24),
+                            // Form
+                            Form(
+                              key: _formKey,
+                              child: isTablet
+                                  ? Row(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        // Left column - Image and category
+                                        Expanded(
+                                          flex: 1,
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              _buildImageSection(isDarkMode, primaryGreen, secondaryPurple, cardColor),
+                                              const SizedBox(height: 24),
+                                              _buildCategorySection(isDarkMode, primaryGreen, secondaryPurple, cardColor),
+                                            ],
+                                          ),
+                                        ),
+                                        const SizedBox(width: 24),
+                                        // Right column - Product details
+                                        Expanded(
+                                          flex: 2,
+                                          child: _buildProductDetailsSection(isDarkMode, primaryGreen, secondaryPurple, cardColor),
+                                        ),
+                                      ],
+                                    )
+                                  : Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        _buildImageSection(isDarkMode, primaryGreen, secondaryPurple, cardColor),
+                                        const SizedBox(height: 24),
+                                        _buildCategorySection(isDarkMode, primaryGreen, secondaryPurple, cardColor),
+                                        const SizedBox(height: 24),
+                                        _buildProductDetailsSection(isDarkMode, primaryGreen, secondaryPurple, cardColor),
+                                      ],
+                                    ),
+                            ),
+                            const SizedBox(height: 32),
+                            // Action Buttons
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                OutlinedButton(
+                                  onPressed: () {
+                                    productProvider.clearSelectedProduct();
+                                    Navigator.of(context).pop();
+                                  },
+                                  style: OutlinedButton.styleFrom(
+                                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    side: BorderSide(
+                                      color: secondaryPurple,
+                                      width: 1,
+                                    ),
+                                  ),
+                                  child: Text(
+                                    'Cancel',
+                                    style: TextStyle(
+                                      color: secondaryPurple,
+                                    ),
                                   ),
                                 ),
-                                child: const Text('Cancel'),
-                              ),
-                              const SizedBox(width: 16),
-                              ElevatedButton(
-                                onPressed: _saveProduct,
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Theme.of(context).primaryColor,
-                                  foregroundColor: Colors.white,
-                                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
+                                const SizedBox(width: 16),
+                                ElevatedButton(
+                                  onPressed: _saveProduct,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: primaryGreen,
+                                    foregroundColor: Colors.white,
+                                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    elevation: 0,
                                   ),
+                                  child: Text(selectedProduct == null ? 'Add Product' : 'Save Changes'),
                                 ),
-                                child: Text(selectedProduct == null ? 'Add Product' : 'Save Changes'),
-                              ),
-                            ],
-                          ),
-                        ],
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildImageSection(bool isDarkMode) {
+  Widget _buildImageSection(
+    bool isDarkMode, 
+    Color primaryGreen, 
+    Color secondaryPurple, 
+    Color cardColor
+  ) {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: isDarkMode ? const Color(0xFF1A1F38) : Colors.white,
+        color: cardColor,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: primaryGreen.withOpacity(0.1),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
         ],
+        border: Border.all(
+          color: primaryGreen.withOpacity(0.1),
+          width: 1,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Product Image',
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
+              color: primaryGreen,
             ),
           ),
           const SizedBox(height: 16),
@@ -361,6 +445,17 @@ class _EditProductScreenState extends State<EditProductScreen> {
                   decoration: BoxDecoration(
                     color: isDarkMode ? Colors.black12 : Colors.grey.shade100,
                     borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: primaryGreen.withOpacity(0.2),
+                      width: 1,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: primaryGreen.withOpacity(0.1),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
                     image: DecorationImage(
                       image: AssetImage(_imageUrl),
                       fit: BoxFit.cover,
@@ -373,12 +468,13 @@ class _EditProductScreenState extends State<EditProductScreen> {
                   icon: const Icon(Icons.upload),
                   label: const Text('Upload Image'),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).primaryColor,
+                    backgroundColor: secondaryPurple,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
+                    elevation: 0,
                   ),
                 ),
               ],
@@ -389,28 +485,38 @@ class _EditProductScreenState extends State<EditProductScreen> {
     );
   }
 
-  Widget _buildCategorySection(bool isDarkMode) {
+  Widget _buildCategorySection(
+    bool isDarkMode, 
+    Color primaryGreen, 
+    Color secondaryPurple, 
+    Color cardColor
+  ) {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: isDarkMode ? const Color(0xFF1A1F38) : Colors.white,
+        color: cardColor,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: primaryGreen.withOpacity(0.1),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
         ],
+        border: Border.all(
+          color: primaryGreen.withOpacity(0.1),
+          width: 1,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Category',
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
+              color: primaryGreen,
             ),
           ),
           const SizedBox(height: 16),
@@ -419,8 +525,28 @@ class _EditProductScreenState extends State<EditProductScreen> {
             decoration: InputDecoration(
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(
+                  color: primaryGreen.withOpacity(0.2),
+                  width: 1,
+                ),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(
+                  color: primaryGreen.withOpacity(0.2),
+                  width: 1,
+                ),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(
+                  color: primaryGreen,
+                  width: 1,
+                ),
               ),
               contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              filled: true,
+              fillColor: isDarkMode ? Colors.black12 : Colors.white,
             ),
             items: _categories.map((String category) {
               return DropdownMenuItem<String>(
@@ -439,34 +565,49 @@ class _EditProductScreenState extends State<EditProductScreen> {
                 });
               }
             },
+            icon: Icon(
+              Icons.arrow_drop_down,
+              color: primaryGreen,
+            ),
+            dropdownColor: cardColor,
           ),
         ],
       ),
     );
   }
 
-  Widget _buildProductDetailsSection(bool isDarkMode) {
+  Widget _buildProductDetailsSection(
+    bool isDarkMode, 
+    Color primaryGreen, 
+    Color secondaryPurple, 
+    Color cardColor
+  ) {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: isDarkMode ? const Color(0xFF1A1F38) : Colors.white,
+        color: cardColor,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: primaryGreen.withOpacity(0.1),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
         ],
+        border: Border.all(
+          color: primaryGreen.withOpacity(0.1),
+          width: 1,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Product Details',
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
+              color: primaryGreen,
             ),
           ),
           const SizedBox(height: 24),
@@ -475,10 +616,33 @@ class _EditProductScreenState extends State<EditProductScreen> {
             controller: _nameController,
             decoration: InputDecoration(
               labelText: 'Product Name',
+              labelStyle: TextStyle(
+                color: primaryGreen,
+              ),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(
+                  color: primaryGreen.withOpacity(0.2),
+                  width: 1,
+                ),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(
+                  color: primaryGreen.withOpacity(0.2),
+                  width: 1,
+                ),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(
+                  color: primaryGreen,
+                  width: 1,
+                ),
               ),
               contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              filled: true,
+              fillColor: isDarkMode ? Colors.black12 : Colors.white,
             ),
             validator: (value) {
               if (value == null || value.isEmpty) {
@@ -493,10 +657,33 @@ class _EditProductScreenState extends State<EditProductScreen> {
             controller: _descriptionController,
             decoration: InputDecoration(
               labelText: 'Description',
+              labelStyle: TextStyle(
+                color: primaryGreen,
+              ),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(
+                  color: primaryGreen.withOpacity(0.2),
+                  width: 1,
+                ),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(
+                  color: primaryGreen.withOpacity(0.2),
+                  width: 1,
+                ),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(
+                  color: primaryGreen,
+                  width: 1,
+                ),
               ),
               contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              filled: true,
+              fillColor: isDarkMode ? Colors.black12 : Colors.white,
             ),
             maxLines: 3,
             validator: (value) {
@@ -515,11 +702,37 @@ class _EditProductScreenState extends State<EditProductScreen> {
                   controller: _priceController,
                   decoration: InputDecoration(
                     labelText: 'Price (\$)',
+                    labelStyle: TextStyle(
+                      color: primaryGreen,
+                    ),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(
+                        color: primaryGreen.withOpacity(0.2),
+                        width: 1,
+                      ),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(
+                        color: primaryGreen.withOpacity(0.2),
+                        width: 1,
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(
+                        color: primaryGreen,
+                        width: 1,
+                      ),
                     ),
                     contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                    prefixIcon: const Icon(Icons.attach_money),
+                    prefixIcon: Icon(
+                      Icons.attach_money,
+                      color: primaryGreen,
+                    ),
+                    filled: true,
+                    fillColor: isDarkMode ? Colors.black12 : Colors.white,
                   ),
                   keyboardType: const TextInputType.numberWithOptions(decimal: true),
                   inputFormatters: [
@@ -545,11 +758,37 @@ class _EditProductScreenState extends State<EditProductScreen> {
                   controller: _stockController,
                   decoration: InputDecoration(
                     labelText: 'Stock',
+                    labelStyle: TextStyle(
+                      color: primaryGreen,
+                    ),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(
+                        color: primaryGreen.withOpacity(0.2),
+                        width: 1,
+                      ),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(
+                        color: primaryGreen.withOpacity(0.2),
+                        width: 1,
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(
+                        color: primaryGreen,
+                        width: 1,
+                      ),
                     ),
                     contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                    prefixIcon: const Icon(Icons.inventory),
+                    prefixIcon: Icon(
+                      Icons.inventory,
+                      color: primaryGreen,
+                    ),
+                    filled: true,
+                    fillColor: isDarkMode ? Colors.black12 : Colors.white,
                   ),
                   keyboardType: TextInputType.number,
                   inputFormatters: [
@@ -577,12 +816,38 @@ class _EditProductScreenState extends State<EditProductScreen> {
             controller: _skuController,
             decoration: InputDecoration(
               labelText: 'SKU (Stock Keeping Unit)',
+              labelStyle: TextStyle(
+                color: primaryGreen,
+              ),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(
+                  color: primaryGreen.withOpacity(0.2),
+                  width: 1,
+                ),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(
+                  color: primaryGreen.withOpacity(0.2),
+                  width: 1,
+                ),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(
+                  color: primaryGreen,
+                  width: 1,
+                ),
               ),
               contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-              prefixIcon: const Icon(Icons.qr_code),
+              prefixIcon: Icon(
+                Icons.qr_code,
+                color: primaryGreen,
+              ),
               helperText: 'Unique identifier for this product',
+              filled: true,
+              fillColor: isDarkMode ? Colors.black12 : Colors.white,
             ),
             validator: (value) {
               if (value == null || value.isEmpty) {
